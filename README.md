@@ -7,7 +7,7 @@ This is work in progress.
 
 ### Information
 
-* [Mapping](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Mapping)
+* [Data Mapping](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Data%20Mapping)
 * [Code Example](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Code%20Example)
 * [Server Configuration Example](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Server%20Configuration%20Example)
 
