@@ -8,6 +8,8 @@ This is work in progress.
 ### Information
 
 * [Data Mapping](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Data%20Mapping)
+* Discovery {TODO}
+* Multi Tenancy {TODO}
 * [Code Example](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Code%20Example)
 * [Server Configuration Example](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Server%20Configuration%20Example)
 
