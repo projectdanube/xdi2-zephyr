@@ -29,9 +29,9 @@ To build all components.
 
     mvn jetty:run
 
-Then access the web interface at
+Then access the server's status page at
 
-	http://localhost:9990/
+	http://localhost:9990/xdi
 
 Or use an XDI client to send XDI messages to
 

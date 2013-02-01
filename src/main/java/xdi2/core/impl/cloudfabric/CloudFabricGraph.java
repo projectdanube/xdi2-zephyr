@@ -1,9 +1,13 @@
 package xdi2.core.impl.cloudfabric;
 
+import java.util.ArrayList;
+
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
+import xdi2.core.Relation;
 import xdi2.core.impl.AbstractGraph;
+import xdi2.core.impl.BasicContextNode;
 
 public class CloudFabricGraph extends AbstractGraph implements Graph {
 
@@ -17,7 +21,7 @@ public class CloudFabricGraph extends AbstractGraph implements Graph {
 	@Override
 	public ContextNode getRootContextNode() {
 		// TODO Auto-generated method stub
-		return null;
+		return new BasicContextNode(this, null, null, new ArrayList<ContextNode> (), new ArrayList<Relation> (), null);
 	}
 
 	@Override
