@@ -1,25 +1,25 @@
 <a href="http://projectdanube.org/" target="_blank"><img src="http://peacekeeper.github.com/xdi2/images/projectdanube_logo.png" align="right"></a>
 <img src="http://peacekeeper.github.com/xdi2/images/logo64.png"><br>
 
-This is the integration project to deploy the [XDI2](http://github.com/peacekeeper/xdi2) server as an "engine" in [CloudFabric](http://github.com/respectio/cloudfabric).
+This is the integration project to deploy the [XDI2](http://github.com/peacekeeper/xdi2) server as an "engine" in [Zephyr](http://github.com/airships/zephyr).
 
 This is work in progress. 
 
 ### Information
 
-* [Data Mapping](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Data%20Mapping)
+* [Data Mapping](https://github.com/peacekeeper/xdi2-zephyr/wiki/Data%20Mapping)
 * Discovery {TODO}
 * Multi Tenancy {TODO}
-* [Code Example](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Code%20Example)
-* [Server Configuration Example](https://github.com/peacekeeper/xdi2-cloudfabric/wiki/Server%20Configuration%20Example)
+* [Code Example](https://github.com/peacekeeper/xdi2-zephyr/wiki/Code%20Example)
+* [Server Configuration Example](https://github.com/peacekeeper/xdi2-zephyr/wiki/Server%20Configuration%20Example)
 
 ### How to build
 
 First, you need to build the main [XDI2](http://github.com/peacekeeper/xdi2) project.
 
-Second, follow the instructions at [CloudFabric](http://github.com/respectio/cloudfabric).
+Second, follow the instructions at [Zephyr](http://github.com/airships/zephyr).
 
-You might have to repeat these initial steps frequently, as both XDI2 and CloudFabric evolve.
+You might have to repeat these initial steps frequently, as both XDI2 and Zephyr evolve.
 
 After that, just run
 
@@ -37,7 +37,7 @@ Then access the server's status page at
 
 Or use an XDI client to send XDI messages to
 
-    http://localhost:9990/xdi/cloudfabric
+    http://localhost:9990/xdi/zephyr
 
 ### How to build as XDI2 plugin
 

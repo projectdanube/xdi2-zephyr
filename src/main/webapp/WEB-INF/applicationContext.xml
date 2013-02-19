@@ -32,7 +32,7 @@
 		</property>
 	</bean>
 
-	<!-- MESSAGING TARGET at /cloudfabric -->
+	<!-- MESSAGING TARGET at /zephyr -->
 	<!-- MessagingTarget: GraphMessagingTarget backed by a CloudFabricGraph -->
 
 	<bean id="graphfactory1" class="xdi2.core.impl.cloudfabric.CloudFabricGraphFactory">
@@ -42,7 +42,7 @@
 
 	<bean id="graph1" factory-bean="graphfactory1" factory-method="openGraph" />
 
-	<bean name="/cloudfabric" class="xdi2.messaging.target.impl.graph.GraphMessagingTarget">
+	<bean name="/zephyr" class="xdi2.messaging.target.impl.graph.GraphMessagingTarget">
 		<property name="graph" ref="graph1" />
 	</bean>
 
