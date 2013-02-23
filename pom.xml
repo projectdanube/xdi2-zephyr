@@ -3,27 +3,27 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>xdi2</groupId>
-	<artifactId>xdi2-cloudfabric</artifactId>
+	<artifactId>xdi2-zephyr</artifactId>
 	<packaging>${packaging.type}</packaging>
 	<version>0.1-SNAPSHOT</version>
-	<name>xdi2-cloudfabric</name>
+	<name>xdi2-zephyr</name>
 
 	<issueManagement>
-		<url>https://github.com/peacekeeper/xdi2-cloudfabric/issues</url>
+		<url>https://github.com/peacekeeper/xdi2-zephyr/issues</url>
 		<system>GitHub Issues</system>
 	</issueManagement>
 
 	<distributionManagement>
 		<site>
 			<id>github-project-site</id>
-			<url>scm:git:ssh://git@github.com/peacekeeper/xdi2-cloudfabric.git:gh-pages</url>
+			<url>scm:git:ssh://git@github.com/peacekeeper/xdi2-zephyr.git:gh-pages</url>
 		</site>
 	</distributionManagement>
 
 	<scm>
-		<url>https://github.com/peacekeeper/xdi2-cloudfabric</url>
-		<connection>scm:git:git://github.com/peacekeeper/xdi2-cloudfabric.git</connection>
-		<developerConnection>scm:git:git@github.com:peacekeeper/xdi2-cloudfabric.git</developerConnection>
+		<url>https://github.com/peacekeeper/xdi2-zephyr</url>
+		<connection>scm:git:git://github.com/peacekeeper/xdi2-zephyr.git</connection>
+		<developerConnection>scm:git:git@github.com:peacekeeper/xdi2-zephyr.git</developerConnection>
 	</scm>
 
 	<properties>
