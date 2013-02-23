@@ -31,22 +31,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		super(graph, contextNode);
 		
-		if (((ZephyrGraph) graph).getSortMode() == ZephyrGraphFactory.SORTMODE_ALPHA) {
-
-			this.contextNodes = new TreeMap<XDI3SubSegment, ZephyrContextNode> ();
-			this.relations = new TreeMap<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> ();
-			this.literal = null;
-		} else if (((ZephyrGraph) graph).getSortMode() == ZephyrGraphFactory.SORTMODE_ORDER) {
-
-			this.contextNodes = new LinkedHashMap<XDI3SubSegment, ZephyrContextNode> ();
-			this.relations = new LinkedHashMap<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> ();
-			this.literal = null;
-		} else {
-
-			this.contextNodes = new HashMap<XDI3SubSegment, ZephyrContextNode> ();
-			this.relations = new HashMap<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> ();
-			this.literal = null;
-		}
+		
 	}
 
 	@Override
