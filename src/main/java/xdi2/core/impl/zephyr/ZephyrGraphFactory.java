@@ -16,11 +16,9 @@ import xdi2.core.impl.AbstractGraphFactory;
 public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFactory {
 
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
-	public static final String DEFAULT_OAUTH_TOKEN = "?token=SECRET";
+	public static final String DEFAULT_OAUTH_TOKEN = "/?token=SECRET";
 	private Map<String, ZephyrGraph> graphs;
-	public static final int SORTMODE_NONE = 0;
-	public static final int SORTMODE_ORDER = 1;
-	public static final int SORTMODE_ALPHA = 2;
+
 
 	private static ZephyrGraphFactory instance = null;
 
@@ -35,7 +33,6 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		this.dataApi = DEFAULT_DATA_API;
 		this.oauthToken = DEFAULT_OAUTH_TOKEN;
 		
-		this.sortmode = SORTMODE_NONE;
 		this.graphs = new HashMap<String, ZephyrGraph> ();
 	}
 	
@@ -58,8 +55,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		
 		if(jsonObject.equals("{}"))
 		{
-			graph = (new ZephyrGraphFactory()).parseGraph("");
-		    // graph = (new MemoryGraphFactory()).parseGraph("");
+			graph = this.parseGraph(jsonObject);
 		}
 		else
 		{
@@ -126,9 +122,4 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		this.rootNode = rootNode;
 	}
 
-	public String toString()
-	{
-		return this.toString();
-	}
-	
 }

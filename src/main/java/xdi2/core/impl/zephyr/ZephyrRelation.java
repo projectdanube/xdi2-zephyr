@@ -12,7 +12,7 @@ public class ZephyrRelation extends AbstractRelation implements Relation {
 
 	private static final long serialVersionUID = -4711688892198885875L;
 
-	ZephyrRelation(Graph graph, ContextNode contextNode) {
+	ZephyrRelation(Graph graph,XDI3Segment arcXri, ContextNode contextNode) {
 
 		super(graph, contextNode);
 	}

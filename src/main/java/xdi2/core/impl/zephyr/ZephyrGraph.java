@@ -34,11 +34,12 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	
 	public String toString()
 	{
-		return this.toString();
+		return "{}";
 	}
 	
 	int getSortMode() {
 
 		return this.sortmode;
 	}
+	
 }
