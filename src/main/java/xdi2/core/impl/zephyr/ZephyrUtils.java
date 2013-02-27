@@ -43,11 +43,7 @@ public class ZephyrUtils {
 		//input.setContentType("application/json");
 
 		request.setEntity(input);
-		//request.addHeader("Cookie", "token=SECRET");
-		//List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-	    //nameValuePairs.add(new BasicNameValuePair("foo","shrey"));
-	    //JSONArray jsonList = JSONArray.fromObject();
-		//request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		
 		
 		System.out.println("Using URL : " + url );
 		

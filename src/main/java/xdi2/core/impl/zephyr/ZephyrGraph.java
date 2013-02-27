@@ -11,18 +11,15 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	private ZephyrContextNode rootContextNode;
 	private int sortmode;
  
- 	ZephyrGraph(ZephyrGraphFactory graphFactory,int sortmode) {
+ 	ZephyrGraph(ZephyrGraphFactory graphFactory) {
 
 		super(graphFactory);
-		this.sortmode = sortmode;
 		this.rootContextNode = new ZephyrContextNode(this, null);
 		this.rootContextNode.arcXri = null;
 	}
 
 	@Override
 	public ContextNode getRootContextNode() {
-		// TODO Auto-generated method stub
-		//return new ZephyrContextNode(this, null);
 		return this.rootContextNode;
 	}
 
