@@ -122,8 +122,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		        if(key.startsWith("+"))
 		        {
 		        	relation = new ZephyrRelation(this.getGraph(), this);
-		        	relation.setArcXri(new XDI3Segment(key, null, null));
-		        	relation.setTargetContextNodeXri(new XDI3Segment(jsonGraph.getString(key), null, null));
+		        	relation.setArcXri(XDI3Segment.create(key));
+		        	relation.setTargetContextNodeXri(XDI3Segment.create(jsonGraph.getString(key)));
 		        	relations.add(relation);
 		        	//relation.add(key + "/" + jsonGraph.getString(key));
 		        }
