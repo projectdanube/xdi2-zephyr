@@ -15,16 +15,20 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZephyrUtils {
+	
+	private static final Logger log = LoggerFactory.getLogger(ZephyrUtils.class);
 	
 	public static String doGet(String url) throws Exception {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpGet request = new HttpGet(url);
-		System.out.println("Using URL : " + url );
+		log.info("Using URL : " + url );
 		request.addHeader("Content-Type", "application/json");
 		HttpResponse response = httpclient.execute(request);
-		System.out.println("Statusline : " + response.getStatusLine());
+		log.info("Statusline : " + response.getStatusLine());
 		InputStream data = response.getEntity().getContent();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
 		String responeLine;
@@ -41,24 +45,22 @@ public class ZephyrUtils {
 		request.addHeader("Content-Type", "application/json");
 		StringEntity input = new StringEntity("{\"" + Key +"\":\""+ Value +"\"}");
 		//input.setContentType("application/json");
-
 		request.setEntity(input);
-		
-		
-		System.out.println("Using URL : " + url );
+	
+		log.info("Using URL : " + url );
 		
 		HttpResponse response = httpclient.execute(request);
-		System.out.println("Statusline : " + response.getStatusLine());
+		log.info("Statusline : " + response.getStatusLine());
 		
 	}
 	
 	public static String doDelete(String url) throws Exception {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpDelete request = new HttpDelete(url);
-		System.out.println("Using URL : " + url );
+		log.info("Using URL : " + url );
 		
 		HttpResponse response = httpclient.execute(request);
-		System.out.println("Statusline : " + response.getStatusLine());
+		log.info("Statusline : " + response.getStatusLine());
 		InputStream data = response.getEntity().getContent();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
 		String responeLine;
@@ -68,6 +70,28 @@ public class ZephyrUtils {
 		    }
 		    return responseBuilder.toString();
 	}
+	
+    public static String searchJson(String jsonstring, String key) {
+
+        String result = "";
+
+        if (jsonstring != null && jsonstring.length() > 0) {
+              String startSearchString = "\"" + key + "\":\"";
+
+              String endSearchString = "\"";
+
+              int startIndex = jsonstring.indexOf(startSearchString)
+                          + startSearchString.length();
+              int endIndex = jsonstring.indexOf(endSearchString, startIndex);
+              if (endIndex - startIndex > 0) {
+                    result = jsonstring.substring(startIndex, endIndex);
+              }
+        }
+
+        return result;
+
+  }
+
 	
 	public static String mapGraph(String jsonObject)
 	{
