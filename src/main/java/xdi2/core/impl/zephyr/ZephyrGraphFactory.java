@@ -13,11 +13,12 @@ import xdi2.core.impl.AbstractGraphFactory;
 public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFactory {
 
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
-	public static final String DEFAULT_OAUTH_TOKEN = "?token=SECRET";
-	public static  String rootNode;
+	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
+	public static String rootNode;
 	
 	private String dataApi;
 	private String oauthToken;
+	public static String userGraph;
 	
 
 	public ZephyrGraphFactory() { 
@@ -30,8 +31,9 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	public Graph openGraph(String identifier)
 	{
 		try {
-		this.rootNode = identifier;
-		String jsonObject = ZephyrUtils.doGet(DEFAULT_DATA_API + identifier + "/*" + DEFAULT_OAUTH_TOKEN);
+		rootNode = identifier;
+		userGraph = ZephyrUtils.doGet(getDataApi() + identifier + "/*?token=" + getOauthToken());
+		
 		
 		return new ZephyrGraph(this);
 		
