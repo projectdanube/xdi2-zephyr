@@ -21,14 +21,14 @@ public class Test {
     	
     	ZephyrGraphFactory graphFactory = new ZephyrGraphFactory();
      
-        graphFactory.setDataApi("http://107.21.179.68:10002/");
+        graphFactory.setDataApi("http://192.168.145.145:10002");
         graphFactory.setOauthToken("SECRET");
 
-        Graph graph = graphFactory.openGraph("(=!3333)");
+        Graph graph = graphFactory.openGraph("(=!1111)");
          
-        ContextNode contextNode = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=markus"));
-        ContextNode contextNode1 = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=shrey"));
-        ContextNode contextNode2 = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=animesh"));
+        ContextNode contextNode = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=123"));
+       // ContextNode contextNode1 = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=shrey"));
+       // ContextNode contextNode2 = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=animesh"));
         
         ReadOnlyIterator<ContextNode> contextNodes = contextNode.getContextNodes();
         while(contextNodes.hasNext())
@@ -41,6 +41,8 @@ public class Test {
        contextNode.createContextNode(XDI3SubSegment.create("$!(+email)")).createLiteral("shrey.jssian@gmail.com");
        contextNode.createContextNode(XDI3SubSegment.create("$!(+name)")).createLiteral("Shrey");
        
+       contextNode.deleteContextNode(XDI3SubSegment.create("$!(+name)"));
+       
 //      Literal emailLiteral = contextNode.getContextNode(XDI3SubSegment.create("$!(+email)")).getLiteral();
 //      System.out.println(emailLiteral.getLiteralData());
 //      emailLiteral.setLiteralData("markus.sabadello@xdi.org");
@@ -51,9 +53,16 @@ public class Test {
         //Relations Operations
        Relation relation = contextNode.createRelation(XDI3Segment.create("+friend"), XDI3Segment.create("=shrey"));
        System.out.println(relation.toString());
-       contextNode.createRelation(XDI3Segment.create("+friend"), XDI3Segment.create("=animesh"));
+       contextNode.createRelation(XDI3Segment.create("+friend"), XDI3Segment.create("=shrey"));
        contextNode.createRelation(XDI3Segment.create("+founder"), XDI3Segment.create("@projectdanube"));
-       contextNode.getRelations();
+       ReadOnlyIterator<Relation> relations = contextNode.getRelations();
+       while(relations.hasNext())
+       {
+       	System.out.println(relations.next().getArcXri().toString());
+       }
+       
+       contextNode.deleteRelation(XDI3Segment.create("+friend"), XDI3Segment.create("=animesh"));
+       contextNode.deleteRelations(XDI3Segment.create("+founder"));
               
 
         XDIWriterRegistry.forFormat("XDI DISPLAY", null).write(graph, System.out);

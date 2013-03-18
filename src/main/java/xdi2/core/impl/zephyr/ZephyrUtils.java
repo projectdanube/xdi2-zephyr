@@ -25,10 +25,10 @@ public class ZephyrUtils {
 	public static String doGet(String url) throws Exception {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpGet request = new HttpGet(url);
-		log.info("Using URL : " + url );
+		log.debug("Using URL : " + url );
 		request.addHeader("Content-Type", "application/json");
 		HttpResponse response = httpclient.execute(request);
-		log.info("Statusline : " + response.getStatusLine());
+		log.debug("Statusline : " + response.getStatusLine());
 		InputStream data = response.getEntity().getContent();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
 		String responeLine;
@@ -47,20 +47,20 @@ public class ZephyrUtils {
 		//input.setContentType("application/json");
 		request.setEntity(input);
 	
-		log.info("Using URL : " + url );
+		log.debug("Using URL : " + url );
 		
 		HttpResponse response = httpclient.execute(request);
-		log.info("Statusline : " + response.getStatusLine());
+		log.debug("Statusline : " + response.getStatusLine());
 		
 	}
 	
 	public static String doDelete(String url) throws Exception {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpDelete request = new HttpDelete(url);
-		log.info("Using URL : " + url );
+		log.debug("Using URL : " + url );
 		
 		HttpResponse response = httpclient.execute(request);
-		log.info("Statusline : " + response.getStatusLine());
+		log.debug("Statusline : " + response.getStatusLine());
 		InputStream data = response.getEntity().getContent();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
 		String responeLine;
@@ -91,28 +91,5 @@ public class ZephyrUtils {
         return result;
 
   }
-
 	
-	public static String mapGraph(String jsonObject)
-	{
-		
-		try {
-			JSONObject jsonGraph  = new JSONObject(jsonObject);
-			//JSONObject  menu = jObject.getJSONObject("menu");
-			
-			Map<String,String> map = new HashMap<String,String>();
-		    Iterator<?> iter = jsonGraph.keys();
-		    while(iter.hasNext()){
-		        String key = (String)iter.next();
-		        String value = jsonGraph.getString(key);
-		        map.put(key,value);
-		    }
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "";
-	
-	}
-
 }
