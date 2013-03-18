@@ -32,7 +32,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	{
 		try {
 		rootNode = identifier;
-		userGraph = ZephyrUtils.doGet(getDataApi() + identifier + "/*?token=" + getOauthToken());
+		userGraph = ZephyrUtils.doGet(getDataApi() + "/" + identifier + "/*?token=" + getOauthToken());
 		
 		
 		return new ZephyrGraph(this);
