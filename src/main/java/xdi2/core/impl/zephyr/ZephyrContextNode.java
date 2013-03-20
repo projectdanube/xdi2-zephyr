@@ -50,7 +50,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 			if(this.getArcXri() != null)
 			{
-				if(!this.getArcXri().toString().equals("=root"))
+				if(!this.getArcXri().toString().equals(ZephyrGraphFactory.rootNode))
 				{	
 				rootContextnode= this.getArcXri().toString();
 				// Check for context node in existing user graph.
@@ -75,7 +75,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			{
 				ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi() + "/" + ZephyrGraphFactory.rootNode + "/" + arcXri.toString() + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(),arcXri.toString(), null);
 				this.objParentNode = this.getGraph().getRootContextNode();
-				this.arcXri = XDI3SubSegment.create("=root");
+				this.arcXri = XDI3SubSegment.create(ZephyrGraphFactory.rootNode);
 			}
 			
 			ZephyrContextNode objZCN = new ZephyrContextNode(this.getGraph(), this);
@@ -95,7 +95,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		try {
 		String rootContextNode = this.arcXri.toString();
 		String response = "";
-		if(rootContextNode.equals("=root"))
+		if(rootContextNode.equals(ZephyrGraphFactory.rootNode))
 		{
 			response = "{}";
 		}
