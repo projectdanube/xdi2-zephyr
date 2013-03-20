@@ -3,6 +3,7 @@ package xdi2.core.impl.zephyr;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.impl.AbstractGraph;
+import xdi2.core.xri3.XDI3SubSegment;
 
 public class ZephyrGraph extends AbstractGraph implements Graph {
 
@@ -15,7 +16,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		super(graphFactory);
 		this.rootContextNode = new ZephyrContextNode(this, null);
-		this.rootContextNode.arcXri = null;
+		this.rootContextNode.arcXri = XDI3SubSegment.create(ZephyrGraphFactory.rootNode);
 	}
 
 	@Override
