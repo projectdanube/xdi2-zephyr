@@ -18,9 +18,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	
 	private String dataApi;
 	private String oauthToken;
-	public static String userGraph;
 	
-
 	public ZephyrGraphFactory() { 
 
 		this.dataApi = DEFAULT_DATA_API;
@@ -32,9 +30,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	{
 		try {
 		rootNode = identifier;
-		userGraph = ZephyrUtils.doGet(getDataApi() + "/" + identifier + "/*?token=" + getOauthToken());
-		
-		
+			
 		return new ZephyrGraph(this);
 		
 		} catch (Exception e) {

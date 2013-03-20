@@ -40,10 +40,17 @@ public class ZephyrUtils {
 	}
 	
 	public static void doPut(String url, String Key, String Value) throws Exception {
+		StringEntity input = null;
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpPut request = new HttpPut(url);
 		request.addHeader("Content-Type", "application/json");
-		StringEntity input = new StringEntity("{\"" + Key +"\":\""+ Value +"\"}");
+		if(Value==null)
+		{
+			input= new StringEntity("{\"" + Key +"\":"+ Value +"}");
+		}else 
+		{
+			input = new StringEntity("{\"" + Key +"\":\""+ Value +"\"}");
+		}
 		//input.setContentType("application/json");
 		request.setEntity(input);
 	
