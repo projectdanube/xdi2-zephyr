@@ -157,7 +157,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 					
 			while(nodes.hasNext()){
 		        String key = (String)nodes.next();
-		        if(!key.startsWith("+"))
+		        if(!key.equals(""))
 		        {
 		        	ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(),key, null);
 		        }
