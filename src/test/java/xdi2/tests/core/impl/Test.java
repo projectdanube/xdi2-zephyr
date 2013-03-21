@@ -81,8 +81,7 @@ public class Test {
 //
 //        animesh.createContextNode(XDI3SubSegment.create("$!(+email)")).createLiteral("Animesh.Chowdhury@neustar.biz");
 //        animesh.createContextNode(XDI3SubSegment.create("$!(+name)")).createLiteral("Animesh");
-
-        XDIWriterRegistry.forFormat("XDI DISPLAY", null).write(graph, System.out);
+     
 
         graph.close();
     }

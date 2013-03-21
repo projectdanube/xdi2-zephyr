@@ -47,7 +47,11 @@ public class ZephyrUtils {
 		if(Value==null)
 		{
 			input= new StringEntity("{\"" + Key +"\":"+ Value +"}");
-		}else 
+		}else if(Key.equals("")) 
+		{
+			input = new StringEntity("{}");
+		}
+		else 
 		{
 			input = new StringEntity("{\"" + Key +"\":\""+ Value +"\"}");
 		}
