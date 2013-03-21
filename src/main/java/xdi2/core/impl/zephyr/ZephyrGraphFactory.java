@@ -14,10 +14,11 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
 	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
-	public static String rootNode;
+	//public static String rootNode;
 	
 	private String dataApi;
 	private String oauthToken;
+	private String graphIdentifier;
 	
 	public ZephyrGraphFactory() { 
 
@@ -29,7 +30,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	public Graph openGraph(String identifier)
 	{
 		try {
-		rootNode = identifier;
+		this.setGraphIdentifier(identifier);
 			
 		return new ZephyrGraph(this);
 		
@@ -57,6 +58,16 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	public void setOauthToken(String oauthToken) {
 
 		this.oauthToken = oauthToken;
+	}
+
+
+	public String getGraphIdentifier() {
+		return graphIdentifier;
+	}
+
+
+	public void setGraphIdentifier(String graphIdentifier) {
+		this.graphIdentifier = graphIdentifier;
 	}
 	
 }
