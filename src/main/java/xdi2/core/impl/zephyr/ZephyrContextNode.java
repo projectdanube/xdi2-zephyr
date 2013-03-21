@@ -2,9 +2,11 @@ package xdi2.core.impl.zephyr;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIUtils;
@@ -18,6 +20,7 @@ import xdi2.core.Literal;
 import xdi2.core.Relation;
 import xdi2.core.exceptions.Xdi2GraphException;
 import xdi2.core.impl.AbstractContextNode;
+import xdi2.core.impl.memory.MemoryRelation;
 import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.core.xri3.XDI3Segment;
 import xdi2.core.xri3.XDI3SubSegment;
@@ -27,6 +30,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 	private static final long serialVersionUID = 2515264347973764604L;
 	private static final Logger log = LoggerFactory.getLogger(ZephyrContextNode.class);
+	private Map<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> relations;
 	
 	XDI3SubSegment arcXri;
 	ContextNode objParentNode;
@@ -34,6 +38,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	
 	ZephyrContextNode(Graph graph, ContextNode contextNode) {
 		super(graph, contextNode);
+		this.relations = new HashMap<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> ();
 	}
 
 	@Override
@@ -68,7 +73,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 				}
 				else
 				{
-					ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi() + "/" + ZephyrGraphFactory.rootNode + "/" + arcXri.toString() + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(),arcXri.toString(), null);
+					ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi() + "/" + ZephyrGraphFactory.rootNode + "/" + arcXri.toString() + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(),"", "");
 				}
 			}
 			else
@@ -174,6 +179,13 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			String parentContextNode = this.getArcXri().toString();
 			String newContextNode = targetContextNode.toString();
 			
+			Map<XDI3Segment, ZephyrRelation> relations = this.relations.get(arcXri);
+			
+			if (relations == null) {
+				relations = new HashMap<XDI3Segment, ZephyrRelation> ();
+			}
+			this.relations.put(arcXri, relations);
+			
 			// Check for relation in existing user graph.
 			String graph = ZephyrUtils.doGet(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + parentContextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken());
 			JSONObject jsonGraph  = new JSONObject(graph);
@@ -197,6 +209,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			ZephyrRelation relation = new ZephyrRelation(this.getGraph(), this);
 			relation.setArcXri(arcXri);
 			relation.setTargetContextNodeXri(XDI3Segment.create(targetContextNode.toString()));
+			relations.put(targetContextNode.getXri(), relation);
 			return relation;
 			
 		} catch (Exception e) {
@@ -209,28 +222,18 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public ReadOnlyIterator<Relation> getRelations() {
 		try {
-			String parentContextNode = this.getArcXri().toString();
-			String response = ZephyrUtils.doGet(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + parentContextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken());
-			JSONObject jsonGraph  = new JSONObject(response);
-			Iterator<String> nodes = jsonGraph.keys();
-			ZephyrRelation relation = null;
 			List<Relation> relations = new ArrayList<Relation>();
+			for (Entry<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> entry : this.relations.entrySet())
+			{
+				log.debug(entry.getKey() + "/" + entry.getValue());
+			    Map<XDI3Segment, ZephyrRelation> relation = this.relations.get(entry.getKey());
+			    for (Entry<XDI3Segment, ZephyrRelation> entry1 : relation.entrySet())
+				{
+			    	log.debug(entry1.getKey() + "/" + entry1.getValue());
+			    	relations.add(entry1.getValue());
+				}
+			}
 			
-			while(nodes.hasNext()){
-		        String key = (String)nodes.next();
-		        if(key.startsWith("+"))
-		        {
-		        	relation = new ZephyrRelation(this.getGraph(), this);
-		        	relation.setArcXri(XDI3Segment.create(key));
-		        	String contextRelations[] = jsonGraph.getString(key).split(",");
-		        	for(String arrRelation : contextRelations)
-		        	{
-		        		relation.setTargetContextNodeXri(XDI3Segment.create(arrRelation));
-			        	relations.add(relation);	
-		        	}
-		        	
-		        }
-		     }
 			 ReadOnlyIterator<Relation> itrReadOnlyRelations = new ReadOnlyIterator<Relation>(relations.iterator());
 			return itrReadOnlyRelations;
 		} catch (Exception e) {
@@ -243,6 +246,10 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	public void deleteRelation(XDI3Segment arcXri, XDI3Segment targetContextNodeXri) {
 		try {
 		String path = this.arcXri.toString();
+		
+		Map<XDI3Segment, ZephyrRelation> relations = this.relations.get(arcXri);
+		relations.remove(targetContextNodeXri);
+		
 		// Get user graph
 		String response = ZephyrUtils.doGet(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + path + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken());
 		// Replace the relation value with null
@@ -266,6 +273,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteRelations(XDI3Segment arcXri) {
 		try {
+			this.relations.remove(arcXri);
+			
 			String contextNode = this.getArcXri().toString();
 			ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(), arcXri.toString(), null);
 			}catch (Exception e) {
@@ -278,22 +287,16 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	public void deleteRelations() {
 		try {
 			String contextNode = this.getArcXri().toString();
-			// Get user graph
-			String response = ZephyrUtils.doGet(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken());
-						
-			// Replace all relation values with null
-			JSONObject jsonGraph  = new JSONObject(response);
-			Iterator<String> nodes = jsonGraph.keys();
-					
-			while(nodes.hasNext()){
-		        String key = (String)nodes.next();
-		        if(key.startsWith("+"))
-		        {
-		        	ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(), key, null);
-		        	
-		        }
-		     }
+			for (Entry<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> entry : this.relations.entrySet())
+			{
+				ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(), entry.getKey().toString(), null);
+				this.relations.remove(entry.getKey());
+				
+			}
 			
+			// Get user graph
+			//String response = ZephyrUtils.doGet(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken());
+					
 			}catch (Exception e) {
 				throw new Xdi2GraphException(e.getMessage());
 			}
