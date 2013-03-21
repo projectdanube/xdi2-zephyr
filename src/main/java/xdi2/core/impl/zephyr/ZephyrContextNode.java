@@ -287,10 +287,13 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	public void deleteRelations() {
 		try {
 			String contextNode = this.getArcXri().toString();
+			
+			
 			for (Entry<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> entry : this.relations.entrySet())
 			{
-				ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(), entry.getKey().toString(), null);
-				this.relations.remove(entry.getKey());
+				String Key = entry.getKey().toString();
+				ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + ZephyrGraphFactory.rootNode + "/" + contextNode + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(), Key, null);
+				this.relations.remove(Key);
 				
 			}
 			

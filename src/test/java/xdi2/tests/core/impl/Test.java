@@ -67,7 +67,7 @@ public class Test {
         
         contextNode.deleteRelation(XDI3Segment.create("+friend"), XDI3Segment.create("=animesh"));
         contextNode.deleteRelations(XDI3Segment.create("+founder"));
-        //contextNode.deleteRelations();
+        contextNode.deleteRelations();
         
 //        ContextNode markus = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=markus"));
 //        ContextNode shrey = graph.getRootContextNode().createContextNode(XDI3SubSegment.create("=shrey"));
