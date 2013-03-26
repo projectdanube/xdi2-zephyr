@@ -148,10 +148,9 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			// Replace all relation values with null
 			JSONObject jsonGraph  = new JSONObject(response);
 			Iterator<String> nodes = jsonGraph.keys();
-					
 			while(nodes.hasNext()){
 		        String key = (String)nodes.next();
-		        if(!key.equals(""))
+		        if(!key.equals("") && !this.relations.containsKey(XDI3SubSegment.create(key)))
 		        {
 		        	ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi()+ "/"  + contextNodePath() + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(),key, null);
 		        }
