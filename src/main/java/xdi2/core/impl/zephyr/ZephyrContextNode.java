@@ -85,13 +85,10 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public ReadOnlyIterator<ContextNode> getContextNodes() {
 		try {
-			String rootContextNode = this.arcXri.toString();
+			//String rootContextNode = this.arcXri.toString();
 			String response = "";
-			if (rootContextNode.equals(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getGraphIdentifier())) {
-				response = "{}";
-			} else {
-				response = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
-			}
+			response = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
+			
 			log.info(response);
 			JSONObject jsonGraph = new JSONObject(response);
 
