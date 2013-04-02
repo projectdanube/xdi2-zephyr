@@ -49,22 +49,21 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public ContextNode createContextNode(XDI3SubSegment arcXri) {
 		try {
+			
+			Iterator<Entry<XDI3SubSegment, ZephyrContextNode>> it = this.contextNodes.entrySet().iterator();
+			while (it.hasNext()) {
+			   Entry<XDI3SubSegment, ZephyrContextNode> entry = it.next(); 
+			   String Key = entry.getKey().toString();
+				if(Key.equals(arcXri.toString()))
+				{
+					throw new Xdi2GraphException("Context Node already exists");
+				}
+			   
+			}
 
 			// URI uri = URIUtils.createURI(PROTOCOL, URL, PORT, MailerSDKConstants.ADD_BRANDS_SERVICE_URL, null, null)
 
 			if (!this.getArcXri().toString().equals(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getGraphIdentifier())) {
-				// parentContextnode= this.getArcXri().toString();
-
-				// Check for context node in existing user graph.
-				String userGraph = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
-				JSONObject jsonGraph = new JSONObject(userGraph);
-				Iterator<String> nodes = jsonGraph.keys();
-				while (nodes.hasNext()) {
-					String key = nodes.next();
-					if (key.equals(arcXri.toString()) && !jsonGraph.getString(key).equals("null")) {
-						throw new Xdi2GraphException("Context Node already exists");
-					}
-				}
 				
 				ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "/" + arcXri.toString() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "", "");
 			} else {
