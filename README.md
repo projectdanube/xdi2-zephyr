@@ -1,7 +1,7 @@
 <a href="http://projectdanube.org/" target="_blank"><img src="http://peacekeeper.github.com/xdi2/images/projectdanube_logo.png" align="right"></a>
 <img src="http://peacekeeper.github.com/xdi2/images/logo64.png"><br>
 
-This is the integration project to deploy the [XDI2](http://github.com/projectdanube/xdi2) server as an "engine" in [Zephyr](http://github.com/airships/zephyr).
+This is the integration project to deploy the [XDI2](http://github.com/peacekeeper/xdi2) server as an "engine" in [Zephyr](http://github.com/airships/zephyr).
 
 This is work in progress. 
 
