@@ -65,21 +65,14 @@ public class ZephyrUtils {
 		
 	}
 	
-	public static String doDelete(String url) throws Exception {
+	public static void doDelete(String url) throws Exception {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpDelete request = new HttpDelete(url);
 		log.debug("Using URL : " + url );
 		
 		HttpResponse response = httpclient.execute(request);
 		log.debug("Statusline : " + response.getStatusLine());
-		InputStream data = response.getEntity().getContent();
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
-		String responeLine;
-		StringBuilder responseBuilder = new StringBuilder();
-		while ((responeLine = bufferedReader.readLine()) != null) {
-			responseBuilder.append(responeLine);
-		    }
-		    return responseBuilder.toString();
+		
 	}
 	
     public static String searchJson(String jsonstring, String key) {
