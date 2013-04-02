@@ -1,5 +1,8 @@
 package xdi2.core.impl.zephyr;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
 import xdi2.core.exceptions.Xdi2GraphException;
@@ -14,30 +17,38 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
 	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
-		
+
 	private String dataApi;
 	private String oauthToken;
 	private String graphIdentifier;
-	
-	public ZephyrGraphFactory() { 
+	private Map<String, ZephyrGraph> graphs;
+
+	public ZephyrGraphFactory() {
 
 		this.dataApi = DEFAULT_DATA_API;
 		this.oauthToken = DEFAULT_OAUTH_TOKEN;
+		this.graphs = new HashMap<String, ZephyrGraph> ();
 	}
-	
-		
-	public Graph openGraph(String identifier)
-	{
+
+	public Graph openGraph(String identifier) {
 		try {
-			ZephyrUtils.doPut(getDataApi()  + "/" + identifier  + "?token="+getOauthToken(),"", "");
-		this.setGraphIdentifier(identifier);
 			
-		return new ZephyrGraph(this);
-		
+			this.setGraphIdentifier(identifier);
+			ZephyrGraph graph = this.graphs.get(identifier);
+			
+			if (graph == null) {
+				
+				graph = new ZephyrGraph(this);
+				this.graphs.put(identifier, graph);
+				ZephyrUtils.doPut(getDataApi() + "/" + identifier + "?token=" + getOauthToken(), "", "");
+			}
+
+			return graph;
+
 		} catch (Exception e) {
 			throw new Xdi2GraphException(e.getMessage());
 		}
-		
+
 	}
 
 	public String getDataApi() {
@@ -60,14 +71,12 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		this.oauthToken = oauthToken;
 	}
 
-
 	public String getGraphIdentifier() {
 		return graphIdentifier;
 	}
 
-
 	public void setGraphIdentifier(String graphIdentifier) {
 		this.graphIdentifier = graphIdentifier;
 	}
-	
+
 }

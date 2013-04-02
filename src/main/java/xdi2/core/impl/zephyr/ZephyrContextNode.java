@@ -18,6 +18,8 @@ import xdi2.core.Literal;
 import xdi2.core.Relation;
 import xdi2.core.exceptions.Xdi2GraphException;
 import xdi2.core.impl.AbstractContextNode;
+import xdi2.core.impl.memory.MemoryContextNode;
+import xdi2.core.util.iterators.CastingIterator;
 import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.core.xri3.XDI3Segment;
 import xdi2.core.xri3.XDI3SubSegment;
@@ -27,6 +29,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	private static final long serialVersionUID = 2515264347973764604L;
 	private static final Logger log = LoggerFactory.getLogger(ZephyrContextNode.class);
 	private Map<XDI3Segment, Map<XDI3Segment, ZephyrRelation>> relations;
+	private Map<XDI3SubSegment, ZephyrContextNode> contextNodes;
 	private List<String> lstArcXRIs = null;
 	XDI3SubSegment arcXri;
 	ContextNode objParentNode;
@@ -34,6 +37,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	ZephyrContextNode(Graph graph, ContextNode contextNode) {
 		super(graph, contextNode);
 		this.relations = new HashMap<XDI3Segment, Map<XDI3Segment, ZephyrRelation>>();
+		this.contextNodes = new HashMap<XDI3SubSegment, ZephyrContextNode> ();
 	}
 
 	@Override
@@ -61,17 +65,18 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 						throw new Xdi2GraphException("Context Node already exists");
 					}
 				}
-				// ZephyrUtils.doPut(((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" +((ZephyrGraphFactory)this.getGraph().getGraphFactory()).getOauthToken(),arcXri.toString(), null);
+				
 				ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "/" + arcXri.toString() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "", "");
 			} else {
 				ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "/" + arcXri.toString() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "", "");
 				this.objParentNode = null; // For Root Context Node, parent object will be null
 			}
 
-			ZephyrContextNode objZCN = new ZephyrContextNode(this.getGraph(), this);
-			objZCN.arcXri = arcXri;
-			objZCN.objParentNode = this;
-			return objZCN;
+			ZephyrContextNode contextNode = new ZephyrContextNode(this.getGraph(), this);
+			contextNode.arcXri = arcXri;
+			contextNode.objParentNode = this;
+			this.contextNodes.put(arcXri, contextNode);
+			return contextNode;
 
 		} catch (Xdi2GraphException e) {
 			throw e;
@@ -85,29 +90,30 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public ReadOnlyIterator<ContextNode> getContextNodes() {
 		try {
-			//String rootContextNode = this.arcXri.toString();
-			String response = "";
-			response = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
-			
-			log.info(response);
-			JSONObject jsonGraph = new JSONObject(response);
-
-			ZephyrContextNode contextNode = null;
-			List<ContextNode> lstContextNode = new ArrayList<ContextNode>();
-
-			Iterator<String> nodes = jsonGraph.keys();
-			while (nodes.hasNext()) {
-				String key = nodes.next();
-				contextNode = new ZephyrContextNode(this.getGraph(), this);
-				if (!key.equals("")) {
-					contextNode.arcXri = XDI3SubSegment.create(key);
-					lstContextNode.add(contextNode);
-				}
-			}
-
-			ReadOnlyIterator<ContextNode> itrContextNodes = new ReadOnlyIterator<ContextNode>(lstContextNode.iterator());
-
-			return itrContextNodes;
+//			String rootContextNode = this.arcXri.toString();
+//			String response = "";
+//			response = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
+//			
+//			log.info(response);
+//			JSONObject jsonGraph = new JSONObject(response);
+//
+//			ZephyrContextNode contextNode = null;
+//			List<ContextNode> lstContextNode = new ArrayList<ContextNode>();
+//
+//			Iterator<String> nodes = jsonGraph.keys();
+//			while (nodes.hasNext()) {
+//				String key = nodes.next();
+//				contextNode = new ZephyrContextNode(this.getGraph(), this);
+//				if (!key.equals("")) {
+//					contextNode.arcXri = XDI3SubSegment.create(key);
+//					lstContextNode.add(contextNode);
+//				}
+//			}
+//
+//			ReadOnlyIterator<ContextNode> itrContextNodes = new ReadOnlyIterator<ContextNode>(lstContextNode.iterator());
+//
+//			return itrContextNodes;
+			return new ReadOnlyIterator<ContextNode> (new CastingIterator<ZephyrContextNode, ContextNode> (this.contextNodes.values().iterator()));
 		} catch (Exception e) {
 			throw new Xdi2GraphException(e.getMessage(), e);
 		}
@@ -277,7 +283,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		try {
 			String contextNode = this.getArcXri().toString();
 
-			String userGraph = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + parentContextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
+			String userGraph = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
 			// Check for context node in existing user graph.
 			JSONObject jsonGraph = new JSONObject(userGraph);
 			Iterator<String> nodes = jsonGraph.keys();
@@ -288,7 +294,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 				}
 			}
 
-			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + parentContextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), contextNode, literalData);
+			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "!", literalData);
 
 			ZephyrLiteral literal = new ZephyrLiteral(this.getGraph(), this);
 			literal.setLiteralData(literalData);
@@ -310,14 +316,14 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			String contextNode = this.arcXri.toString();
 			this.objParentNode = this.getContextNode();
 			// Get user graph
-			String response = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + parentContextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
+			String response = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
 
 			// Find for the literal
 			JSONObject jsonGraph = new JSONObject(response);
 			Iterator<String> nodes = jsonGraph.keys();
 			while (nodes.hasNext()) {
 				String key = (String) nodes.next();
-				if (key.equals(contextNode.toString())) {
+				if (key.equals("!")) {
 					literal = new ZephyrLiteral(this.getGraph(), this);
 					literal.setLiteralData(jsonGraph.getString(key));
 				}
@@ -334,7 +340,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		try {
 			String contextNode = this.arcXri.toString();
 			this.objParentNode = this.getContextNode();
-			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + parentContextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), contextNode, null);
+			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "!", null);
 
 		} catch (Exception e) {
 			throw new Xdi2GraphException(e.getMessage(), e);
