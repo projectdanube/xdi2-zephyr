@@ -46,7 +46,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 			return graph;
 
 		} catch (Exception e) {
-			throw new Xdi2GraphException(e.getMessage());
+			throw new Xdi2GraphException(e.getMessage(), e);
 		}
 
 	}
