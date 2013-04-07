@@ -15,7 +15,7 @@ This is work in progress.
 
 ### How to build
 
-First, you need to build the main [XDI2](http://github.com/projectdanube/xdi2) project.
+First, you need to build the main [XDI2](http://github.com/peacekeeper/xdi2) project.
 
 Second, follow the instructions at [Zephyr](http://github.com/airships/zephyr).
 
