@@ -7,11 +7,11 @@ This is work in progress.
 
 ### Information
 
-* [Data Mapping](https://github.com/peacekeeper/xdi2-zephyr/wiki/Data%20Mapping)
+* [Data Mapping](https://github.com/projectdanube/xdi2-zephyr/wiki/Data%20Mapping)
 * Discovery {TODO}
 * Multi Tenancy {TODO}
-* [Code Example](https://github.com/peacekeeper/xdi2-zephyr/wiki/Code%20Example)
-* [Server Configuration Example](https://github.com/peacekeeper/xdi2-zephyr/wiki/Server%20Configuration%20Example)
+* [Code Example](https://github.com/projectdanube/xdi2-zephyr/wiki/Code%20Example)
+* [Server Configuration Example](https://github.com/projectdanube/xdi2-zephyr/wiki/Server%20Configuration%20Example)
 
 ### How to build
 
