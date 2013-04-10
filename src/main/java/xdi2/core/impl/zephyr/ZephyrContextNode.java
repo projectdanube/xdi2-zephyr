@@ -32,7 +32,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	private Map<XDI3SubSegment, ZephyrContextNode> contextNodes;
 	private List<String> lstArcXRIs = null;
 	XDI3SubSegment arcXri;
-	ContextNode objParentNode;
+	//ContextNode objParentNode;
 
 	ZephyrContextNode(Graph graph, ContextNode contextNode) {
 		super(graph, contextNode);
@@ -68,12 +68,12 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 				ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" +((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getGraphIdentifier()+ "/"+ contextNodePath() + "/" + arcXri.toString() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "", "");
 			} else {
 				ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" +((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getGraphIdentifier()  + "/" + arcXri.toString() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "", "");
-				this.objParentNode = null; // For Root Context Node, parent object will be null
+				//this.objParentNode = null; // For Root Context Node, parent object will be null
 			}
 
 			ZephyrContextNode contextNode = new ZephyrContextNode(this.getGraph(), this);
 			contextNode.arcXri = arcXri;
-			contextNode.objParentNode = this;
+			//contextNode.objParentNode = this;
 			this.contextNodes.put(arcXri, contextNode);
 			return contextNode;
 
@@ -121,7 +121,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteContextNode(XDI3SubSegment arcXri) {
 		try {
-			this.objParentNode = this.getContextNode();
+			//this.objParentNode = this.getContextNode();
 			// Put the context node value as null to zephyr store
 			ZephyrUtils.doDelete(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getGraphIdentifier()+ "/" + contextNodePath() + "/" + arcXri.toString() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
 			
@@ -134,7 +134,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteContextNodes() {
 		try {
-			this.objParentNode = this.getContextNode();
+			//this.objParentNode = this.getContextNode();
 			
 			Iterator<Entry<XDI3SubSegment, ZephyrContextNode>> it = this.contextNodes.entrySet().iterator();
 			while (it.hasNext()) {
@@ -307,7 +307,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		try {
 			ZephyrLiteral literal = null;
 			String contextNode = this.arcXri.toString();
-			this.objParentNode = this.getContextNode();
+			//this.objParentNode = this.getContextNode();
 			// Get user graph
 			String response = ZephyrUtils.doGet(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/"  + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getGraphIdentifier()+ "/"+ contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken());
 
@@ -332,7 +332,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	public void deleteLiteral() {
 		try {
 			String contextNode = this.arcXri.toString();
-			this.objParentNode = this.getContextNode();
+			//this.objParentNode = this.getContextNode();
 			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getGraphIdentifier()+ "/"+ contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "!", null);
 
 		} catch (Exception e) {
@@ -349,14 +349,14 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 	private void getListArcXri(ContextNode objNode) {
 		ZephyrContextNode objNode_Zephyr = (ZephyrContextNode) objNode;
-		if (objNode_Zephyr.objParentNode.getArcXri() != null)
-			getListArcXri(objNode_Zephyr.objParentNode);
+		if (objNode_Zephyr.getContextNode().getArcXri() != null)
+			getListArcXri(objNode_Zephyr.getContextNode());
 		lstArcXRIs.add(objNode_Zephyr.getArcXri().toString());
 	}
 
 	private String parentContextNodePath() {
 		lstArcXRIs = new ArrayList<String>();
-		getListArcXri(this.objParentNode);
+		getListArcXri(this.getContextNode());
 		return StringUtils.join(lstArcXRIs, "/");
 	}
 
