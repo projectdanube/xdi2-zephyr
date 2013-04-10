@@ -287,7 +287,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 				}
 			}
 
-			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + ((ZephyrGraph)this.getGraph()).getGraphIdentifier() + "/"+ contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "!", literalData);
+			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + ((ZephyrGraph)this.getGraph()).getGraphIdentifier() + "/"+ contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "<>", literalData);
 
 			ZephyrLiteral literal = new ZephyrLiteral(this.getGraph(), this);
 			literal.setLiteralData(literalData);
@@ -316,7 +316,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			Iterator<String> nodes = jsonGraph.keys();
 			while (nodes.hasNext()) {
 				String key = (String) nodes.next();
-				if (key.equals("!")) {
+				if (key.equals("<>")) {
 					literal = new ZephyrLiteral(this.getGraph(), this);
 					literal.setLiteralData(jsonGraph.getString(key));
 				}
@@ -333,7 +333,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		try {
 			String contextNode = this.arcXri.toString();
 			//this.objParentNode = this.getContextNode();
-			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + ((ZephyrGraph)this.getGraph()).getGraphIdentifier() + "/"+ contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "!", null);
+			ZephyrUtils.doPut(((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getDataApi() + "/" + ((ZephyrGraph)this.getGraph()).getGraphIdentifier() + "/"+ contextNodePath() + "?token=" + ((ZephyrGraphFactory) this.getGraph().getGraphFactory()).getOauthToken(), "<>", null);
 
 		} catch (Exception e) {
 			throw new Xdi2GraphException(e.getMessage(), e);
