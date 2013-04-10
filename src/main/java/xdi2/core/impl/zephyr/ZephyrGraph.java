@@ -16,7 +16,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		super(graphFactory);
 		this.rootContextNode = new ZephyrContextNode(this, null);
-		this.rootContextNode.arcXri = XDI3SubSegment.create(((ZephyrGraphFactory)this.getGraphFactory()).getGraphIdentifier());
+		this.rootContextNode.arcXri = null;
 	}
 
 	@Override
