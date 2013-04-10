@@ -11,12 +11,14 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	
 	private ZephyrContextNode rootContextNode;
 	private int sortmode;
+	private String graphIdentifier;
  
- 	ZephyrGraph(ZephyrGraphFactory graphFactory) {
+ 	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier) {
 
 		super(graphFactory);
 		this.rootContextNode = new ZephyrContextNode(this, null);
 		this.rootContextNode.arcXri = null;
+		this.setGraphIdentifier(identifier);
 	}
 
 	@Override
@@ -40,4 +42,11 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 		return this.sortmode;
 	}
 	
+	public String getGraphIdentifier() {
+		return graphIdentifier;
+	}
+
+	public void setGraphIdentifier(String graphIdentifier) {
+		this.graphIdentifier = graphIdentifier;
+	}
 }

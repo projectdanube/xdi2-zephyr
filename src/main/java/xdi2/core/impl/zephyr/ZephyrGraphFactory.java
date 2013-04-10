@@ -20,7 +20,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	private String dataApi;
 	private String oauthToken;
-	private String graphIdentifier;
+	
 	private Map<String, ZephyrGraph> graphs;
 
 	public ZephyrGraphFactory() {
@@ -33,12 +33,11 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	public Graph openGraph(String identifier) {
 		try {
 			
-			this.setGraphIdentifier(identifier);
 			ZephyrGraph graph = this.graphs.get(identifier);
 			
 			if (graph == null) {
 				
-				graph = new ZephyrGraph(this);
+				graph = new ZephyrGraph(this,identifier);
 				this.graphs.put(identifier, graph);
 				ZephyrUtils.doPut(getDataApi() + "/" + identifier + "?token=" + getOauthToken(), "", "");
 			}
@@ -71,12 +70,5 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		this.oauthToken = oauthToken;
 	}
 
-	public String getGraphIdentifier() {
-		return graphIdentifier;
-	}
-
-	public void setGraphIdentifier(String graphIdentifier) {
-		this.graphIdentifier = graphIdentifier;
-	}
 
 }
