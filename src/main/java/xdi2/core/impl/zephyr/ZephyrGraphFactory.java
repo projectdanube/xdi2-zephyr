@@ -2,8 +2,8 @@ package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.AbstractGraphFactory;
@@ -32,8 +32,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 		// create cache
 
-		CacheManager.getInstance().addCache(identifier);
-		Cache cache = CacheManager.getInstance().getCache(identifier);
+		Ehcache cache = CacheManager.getInstance().addCacheIfAbsent(identifier);
 
 		// create graph
 

@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,31 +42,6 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	public XDI3SubSegment getArcXri() {
 
 		return this.arcXri;
-	}
-
-	private JSONObject getJson() {
-
-		String contextNodePath = this.contextNodePath(false);
-
-		Element element = ((ZephyrGraph) this.getGraph()).getCache().get(contextNodePath);
-element = null;
-		if (element == null){
-
-			// Zephyr request
-
-			JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(contextNodePath); 
-
-			// done
-
-			((ZephyrGraph) this.getGraph()).getCache().put(new Element(contextNodePath, json));
-			return json;
-		} else {
-
-			// done
-
-			JSONObject json = (JSONObject) element.getObjectValue();
-			return json;
-		}
 	}
 
 	@Override
@@ -122,7 +95,7 @@ element = null;
 		final JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(true));
 		if (json == null) return new EmptyIterator<ContextNode> ();
 
-		// parse JSON
+		// parsing
 
 		final String prefix = ((ZephyrGraph) this.getGraph()).graphContextNodePath(this.contextNodePath(false)) + "/";
 
@@ -191,7 +164,13 @@ element = null;
 
 		this.checkRelation(arcXri, targetContextNode, true);
 
-		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// manipulation
+
+		JSONArray array = json.getJSONArray(arcXri.toString());
 		if (array == null) array = new JSONArray();
 		array.add(targetContextNode.getXri().toString());
 
@@ -209,7 +188,13 @@ element = null;
 
 		this.checkRelation(arcXri, targetContextNode, false);
 
-		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// manipulation
+
+		JSONArray array = json.getJSONArray(arcXri.toString());
 		if (array == null) array = new JSONArray();
 		if (! array.contains(targetContextNode.getXri().toString())) array.add(targetContextNode.getXri().toString());
 
@@ -225,7 +210,13 @@ element = null;
 	@Override
 	public Relation getRelation(XDI3Segment arcXri, XDI3Segment targetContextNodeXri) {
 
-		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// manipulation
+
+		JSONArray array = json.getJSONArray(arcXri.toString());
 		if (array == null) return null;
 		if (! array.contains(targetContextNodeXri.toString())) return null;
 
@@ -237,10 +228,14 @@ element = null;
 	@Override
 	public ReadOnlyIterator<Relation> getRelations(final XDI3Segment arcXri) {
 
-		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
-		if (array == null) return new EmptyIterator<Relation> ();
+		// Zephyr request
 
-		// parse JSON
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// parsing
+
+		JSONArray array = json.getJSONArray(arcXri.toString());
+		if (array == null) return new EmptyIterator<Relation> ();
 
 		return new SelectingMappingIterator<Object, Relation> (array.iterator()) {
 
@@ -269,9 +264,11 @@ element = null;
 	@Override
 	public ReadOnlyIterator<Relation> getRelations() {
 
-		JSONObject json = this.getJson();
+		// Zephyr request
 
-		// parse JSON
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// parsing
 
 		Iterator<Entry<String, Object>> entries = json.entrySet().iterator();
 
@@ -329,7 +326,13 @@ element = null;
 	@Override
 	public void deleteRelation(XDI3Segment arcXri, XDI3Segment targetContextNodeXri) {
 
-		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// manipulation
+
+		JSONArray array = json.getJSONArray(arcXri.toString());
 		if (! array.contains(targetContextNodeXri.toString())) return;
 		array.remove(targetContextNodeXri.toString());
 
@@ -341,7 +344,13 @@ element = null;
 	@Override
 	public void deleteRelations(XDI3Segment arcXri) {
 
-		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// manipulation
+
+		JSONArray array = json.getJSONArray(arcXri.toString());
 		if (array == null) return;
 		array.clear();
 
@@ -393,7 +402,13 @@ element = null;
 	@Override
 	public Literal getLiteral() {
 
-		JSONArray array = this.getJson().getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// manipulation
+
+		JSONArray array = json.getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
 		if (array == null || array.size() < 1) return null;
 		String literalData = array.getString(0);
 
@@ -405,7 +420,13 @@ element = null;
 	@Override
 	public void deleteLiteral() {
 
-		JSONArray array = this.getJson().getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+
+		// manipulation
+
+		JSONArray array = json.getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
 		if (array == null) return;
 		array.clear();
 

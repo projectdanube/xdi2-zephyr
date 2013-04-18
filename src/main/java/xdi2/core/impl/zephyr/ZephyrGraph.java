@@ -2,7 +2,7 @@ package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
 
-import net.sf.ehcache.Cache;
+import net.sf.ehcache.Ehcache;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.exceptions.Xdi2GraphException;
@@ -15,11 +15,11 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	private static final long serialVersionUID = -8716740616499117574L;
 
 	private String identifier;
-	private Cache cache;
+	private Ehcache cache;
 
 	private ZephyrContextNode rootContextNode;
 
-	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, Cache cache) {
+	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, Ehcache cache) {
 
 		super(graphFactory);
 
@@ -46,7 +46,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 		return this.identifier;
 	}
 
-	public Cache getCache() {
+	public Ehcache getEhcache() {
 
 		return this.cache;
 	}
