@@ -1,5 +1,6 @@
 package xdi2.core.impl.zephyr;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -118,10 +119,10 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 				}
 
 				if (entry.getKey().substring(prefix.length()).indexOf('/') != -1) {
-					
+
 					return false;
 				}
-				
+
 				if (! (entry.getValue() instanceof JSONObject)) {
 
 					log.warn("Invalid value in JSON object: " + entry.getValue() + " (not a JSON object)");
@@ -333,7 +334,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	public void deleteRelations() {
 
 		// TODO
-		
+
 		super.deleteRelations();
 	}
 
@@ -342,11 +343,12 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		this.checkLiteral(literalData, true);
 
-		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), literalData);
+		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
+		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), array);
 
 		// Zephyr request
 
-		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), literalData);
+		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), array);
 
 		// done
 
@@ -358,11 +360,12 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		this.checkLiteral(literalData, false);
 
-		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), literalData);
+		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
+		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), array);
 
 		// Zephyr request
 
-		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), literalData);
+		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), array);
 
 		// done
 
@@ -372,8 +375,9 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public Literal getLiteral() {
 
-		String literalData = this.getJson().getString(XDIConstants.XRI_S_LITERAL.toString());
-		if (literalData == null) return null;
+		JSONArray array = this.getJson().getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
+		if (array == null || array.size() < 1) return null;
+		String literalData = array.getString(0);
 
 		// done
 
@@ -383,14 +387,13 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteLiteral() {
 
-		JSONObject json = this.getJson();
-		String value = json.getString(XDIConstants.XRI_S_LITERAL.toString());
-		json = new JSONObject();
-		if (value != null) json.put(XDIConstants.XRI_S_LITERAL.toString(), value);
+		JSONArray array = this.getJson().getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
+		if (array == null) return;
+		array.clear();
 
 		// Zephyr request
 
-		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), json);
+		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), array);
 	}
 
 	String contextNodePath(XDI3SubSegment arcXri, boolean star) {
