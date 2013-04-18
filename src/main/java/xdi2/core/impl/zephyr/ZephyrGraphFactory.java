@@ -2,6 +2,8 @@ package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.AbstractGraphFactory;
@@ -28,8 +30,15 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	@Override
 	public Graph openGraph(String identifier) throws IOException {
 
-		ZephyrGraph graph = new ZephyrGraph(this, identifier);
-		
+		// create cache
+
+		CacheManager.getInstance().addCache(identifier);
+		Cache cache = CacheManager.getInstance().getCache(identifier);
+
+		// create graph
+
+		ZephyrGraph graph = new ZephyrGraph(this, identifier, cache);
+
 		// Zephyr request
 
 		graph.doPut("", null, null);

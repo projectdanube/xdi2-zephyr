@@ -2,6 +2,7 @@ package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
 
+import net.sf.ehcache.Cache;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.exceptions.Xdi2GraphException;
@@ -14,14 +15,16 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	private static final long serialVersionUID = -8716740616499117574L;
 
 	private String identifier;
+	private Cache cache;
 
 	private ZephyrContextNode rootContextNode;
 
-	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier) {
+	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, Cache cache) {
 
 		super(graphFactory);
 
 		this.identifier = identifier;
+		this.cache = cache;
 
 		this.rootContextNode = new ZephyrContextNode(this, null, null, null);
 	}
@@ -41,6 +44,11 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	public String getIdentifier() {
 
 		return this.identifier;
+	}
+
+	public Cache getCache() {
+
+		return this.cache;
 	}
 
 	JSONObject doGet(String contextNodePath) throws Xdi2GraphException {
@@ -90,13 +98,13 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	String graphContextNodePath(String contextNodePath) {
 
 		StringBuilder graphContextNodePath = new StringBuilder();
-		
+
 		if (this.getIdentifier() != null) graphContextNodePath.append("/" + ZephyrUtils.encode(this.getIdentifier()));
 		graphContextNodePath.append(contextNodePath);
-		
+
 		return graphContextNodePath.toString();
 	}
-	
+
 	String url(String graphContextNodePath) {
 
 		ZephyrGraphFactory graphFactory = (ZephyrGraphFactory) this.getGraphFactory();

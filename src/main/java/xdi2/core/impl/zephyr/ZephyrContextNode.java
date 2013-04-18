@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +48,27 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 	private JSONObject getJson() {
 
-		// Zephyr request
+		String contextNodePath = this.contextNodePath(false);
 
-		return ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false));
+		Element element = ((ZephyrGraph) this.getGraph()).getCache().get(contextNodePath);
+element = null;
+		if (element == null){
+
+			// Zephyr request
+
+			JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(contextNodePath); 
+
+			// done
+
+			((ZephyrGraph) this.getGraph()).getCache().put(new Element(contextNodePath, json));
+			return json;
+		} else {
+
+			// done
+
+			JSONObject json = (JSONObject) element.getObjectValue();
+			return json;
+		}
 	}
 
 	@Override
