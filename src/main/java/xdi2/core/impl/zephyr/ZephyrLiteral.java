@@ -1,6 +1,7 @@
 package xdi2.core.impl.zephyr;
 
 import xdi2.core.Literal;
+import xdi2.core.constants.XDIConstants;
 import xdi2.core.impl.AbstractLiteral;
 
 public class ZephyrLiteral extends AbstractLiteral implements Literal {
@@ -26,5 +27,9 @@ public class ZephyrLiteral extends AbstractLiteral implements Literal {
 	public void setLiteralData(String literalData) {
 
 		this.literalData = literalData;
+
+		// Zephyr request
+
+		((ZephyrGraph) this.getGraph()).doPut(((ZephyrContextNode) this.getContextNode()).contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), literalData);
 	}
 }

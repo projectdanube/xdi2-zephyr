@@ -1,11 +1,9 @@
 package xdi2.core.impl.zephyr;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
-import xdi2.core.exceptions.Xdi2GraphException;
 import xdi2.core.impl.AbstractGraphFactory;
 
 /**
@@ -21,34 +19,22 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	private String dataApi;
 	private String oauthToken;
 
-	private Map<String, ZephyrGraph> graphs;
-
 	public ZephyrGraphFactory() {
 
 		this.dataApi = DEFAULT_DATA_API;
 		this.oauthToken = DEFAULT_OAUTH_TOKEN;
-		this.graphs = new HashMap<String, ZephyrGraph> ();
 	}
 
 	@Override
-	public Graph openGraph(String identifier) {
+	public Graph openGraph(String identifier) throws IOException {
 
-		try {
+		// Zephyr request
 
-			ZephyrGraph graph = this.graphs.get(identifier);
+		ZephyrUtils.doPut(getDataApi() + "/" + identifier + "?token=" + getOauthToken(), "", "");
 
-			if (graph == null) {
+		// done
 
-				graph = new ZephyrGraph(this,identifier);
-				this.graphs.put(identifier, graph);
-				ZephyrUtils.doPut(getDataApi() + "/" + identifier + "?token=" + getOauthToken(), "", "");
-			}
-
-			return graph;
-		} catch (Exception e) {
-
-			throw new Xdi2GraphException(e.getMessage(), e);
-		}
+		return new ZephyrGraph(this, identifier);
 	}
 
 	public String getDataApi() {

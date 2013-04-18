@@ -15,15 +15,15 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 	private static final long serialVersionUID = -8716740616499117574L;
 
-	private String graphIdentifier;
+	private String identifier;
 
 	private ZephyrContextNode rootContextNode;
 
-	ZephyrGraph(ZephyrGraphFactory graphFactory, String graphIdentifier) {
+	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier) {
 
 		super(graphFactory);
 
-		this.graphIdentifier = graphIdentifier;
+		this.identifier = identifier;
 
 		this.rootContextNode = new ZephyrContextNode(this, null, null, null);
 	}
@@ -40,16 +40,16 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 	}
 
-	public String getGraphIdentifier() {
+	public String getIdentifier() {
 
-		return this.graphIdentifier;
+		return this.identifier;
 	}
 
 	JSONObject doGet(String contextNodePath) throws Xdi2GraphException {
 
 		try {
 
-			return ZephyrUtils.doGet(contextNodePath(contextNodePath));
+			return ZephyrUtils.doGet(url(contextNodePath));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP GET: " + ex.getMessage(), ex);
@@ -60,7 +60,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			ZephyrUtils.doPut(contextNodePath(contextNodePath), json);
+			ZephyrUtils.doPut(url(contextNodePath), json);
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP PUT: " + ex.getMessage(), ex);
@@ -71,7 +71,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			ZephyrUtils.doPut(contextNodePath(contextNodePath), key, value);
+			ZephyrUtils.doPut(url(contextNodePath), key, value);
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP PUT: " + ex.getMessage(), ex);
@@ -82,14 +82,14 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			ZephyrUtils.doDelete(contextNodePath(contextNodePath));
+			ZephyrUtils.doDelete(url(contextNodePath));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP DELETE: " + ex.getMessage(), ex);
 		}
 	}
 
-	String contextNodePath(String contextNodePath) {
+	String url(String contextNodePath) {
 
 		try {
 
@@ -99,7 +99,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 			url.append(graphFactory.getDataApi());
 			if (! graphFactory.getDataApi().endsWith("/")) url.append("/");
-			url.append(URLEncoder.encode(this.getGraphIdentifier(), "UTF-8") + "/");
+			if (this.getIdentifier() != null) url.append(URLEncoder.encode(this.getIdentifier(), "UTF-8") + "/");
 			url.append(contextNodePath);
 			url.append("?token=" + graphFactory.getOauthToken());
 
