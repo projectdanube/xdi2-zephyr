@@ -1,7 +1,5 @@
 package xdi2.core.impl.zephyr;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -31,14 +29,12 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	private static final Logger log = LoggerFactory.getLogger(ZephyrContextNode.class);
 
 	private XDI3SubSegment arcXri;
-	private JSONObject json;
 
 	ZephyrContextNode(ZephyrGraph graph, ZephyrContextNode contextNode, XDI3SubSegment arcXri, JSONObject json) {
 
 		super(graph, contextNode);
 
 		this.arcXri = arcXri;
-		this.json = json;
 	}
 
 	@Override
@@ -49,14 +45,9 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 	private JSONObject getJson() {
 
-		if (this.json != null) {
+		// Zephyr request
 
-			// Zephyr request
-
-			this.json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false));
-		}
-
-		return this.json;
+		return ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false));
 	}
 
 	@Override
@@ -90,13 +81,29 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	}
 
 	@Override
+	public ContextNode getContextNode(final XDI3SubSegment contextNodeArcXri) {
+
+		// Zephyr request
+
+		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(contextNodeArcXri, false));
+		if (json == null) return null;
+
+		// done
+
+		return new ZephyrContextNode((ZephyrGraph) this.getGraph(), this, contextNodeArcXri, json);
+	}
+
+	@Override
 	public ReadOnlyIterator<ContextNode> getContextNodes() {
 
 		// Zephyr request
 
 		final JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(true));
+		if (json == null) return new EmptyIterator<ContextNode> ();
 
 		// parse JSON
+
+		final String prefix = ((ZephyrGraph) this.getGraph()).graphContextNodePath(this.contextNodePath(false)) + "/";
 
 		Iterator<Entry<String, Object>> entries = json.entrySet().iterator();
 
@@ -105,13 +112,17 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			@Override
 			public boolean select(Entry<String, Object> entry) {
 
-				if (! entry.getKey().startsWith("/")) {
+				if (! entry.getKey().startsWith(prefix)) {
 
-					log.warn("Invalid key in JSON object: " + entry.getKey());
 					return false;
 				}
 
-				if (entry.getValue() instanceof JSONObject) {
+				if (entry.getKey().substring(prefix.length()).indexOf('/') != -1) {
+					
+					return false;
+				}
+				
+				if (! (entry.getValue() instanceof JSONObject)) {
 
 					log.warn("Invalid value in JSON object: " + entry.getValue() + " (not a JSON object)");
 					return false;
@@ -123,7 +134,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			@Override
 			public ContextNode map(Entry<String, Object> entry) {
 
-				XDI3SubSegment arcXri = XDI3SubSegment.create(entry.getKey().substring(1));
+				XDI3SubSegment arcXri = XDI3SubSegment.create(ZephyrUtils.decode(entry.getKey().substring(prefix.length())));
 				JSONObject innerJson = (JSONObject) entry.getValue();
 
 				return new ZephyrContextNode((ZephyrGraph) ZephyrContextNode.this.getGraph(), ZephyrContextNode.this, arcXri, innerJson);
@@ -134,9 +145,16 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteContextNode(XDI3SubSegment arcXri) {
 
+		// delete incoming relations
+
+		ContextNode contextNode = this.getContextNode(arcXri);
+		if (contextNode == null) return;
+
+		for (Iterator<Relation> relations = contextNode.getIncomingRelations(); relations.hasNext(); ) relations.next().delete();
+
 		// Zephyr request
 
-		((ZephyrGraph) this.getGraph()).doDelete(this.contextNodePath(arcXri, false));
+		((ZephyrGraph) this.getGraph()).doDelete(this.contextNodePath(arcXri, true));
 	}
 
 	@Override
@@ -153,7 +171,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		this.checkRelation(arcXri, targetContextNode, true);
 
 		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
-		if (array == null) array = new JSONArray();
+		if (array == null) { array = new JSONArray(); this.getJson().put(arcXri.toString(), array); }
 		array.add(targetContextNode.getXri().toString());
 
 		// Zephyr request
@@ -171,7 +189,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		this.checkRelation(arcXri, targetContextNode, false);
 
 		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
-		if (array == null) array = new JSONArray();
+		if (array == null) { array = new JSONArray(); this.getJson().put(arcXri.toString(), array); }
 		if (! array.contains(targetContextNode.getXri().toString())) array.add(targetContextNode.getXri().toString());
 
 		// Zephyr request
@@ -208,7 +226,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			@Override
 			public boolean select(Object object) {
 
-				if (object instanceof JSONArray) {
+				if (! (object instanceof String)) {
 
 					log.warn("Invalid element in JSON array: " + object + " (not a string)");
 					return false;
@@ -246,7 +264,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 					return false;
 				}
 
-				if (entry.getValue() instanceof JSONArray) {
+				if (! (entry.getValue() instanceof JSONArray)) {
 
 					log.warn("Invalid value in JSON object: " + entry.getValue() + " (not a JSONArray)");
 					return false;
@@ -291,7 +309,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	public void deleteRelation(XDI3Segment arcXri, XDI3Segment targetContextNodeXri) {
 
 		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
-		if (array.contains(targetContextNodeXri.toString())) array.remove(targetContextNodeXri.toString());
+		if (! array.contains(targetContextNodeXri.toString())) return;
+		array.remove(targetContextNodeXri.toString());
 
 		// Zephyr request
 
@@ -301,7 +320,9 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteRelations(XDI3Segment arcXri) {
 
-		JSONArray array = new JSONArray();
+		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
+		if (array == null) return;
+		array.clear();
 
 		// Zephyr request
 
@@ -311,20 +332,33 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteRelations() {
 
-		JSONObject json = this.getJson();
-		String value = json.getString(XDIConstants.XRI_S_LITERAL.toString());
-		json = new JSONObject();
-		if (value != null) json.put(XDIConstants.XRI_S_LITERAL.toString(), value);
-
-		// Zephyr request
-
-		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), json);
+		// TODO
+		
+		super.deleteRelations();
 	}
 
 	@Override
 	public Literal createLiteral(String literalData) {
 
 		this.checkLiteral(literalData, true);
+
+		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), literalData);
+
+		// Zephyr request
+
+		((ZephyrGraph) this.getGraph()).doPut(this.contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), literalData);
+
+		// done
+
+		return new ZephyrLiteral(this, literalData);
+	}
+
+	@Override
+	public Literal setLiteral(String literalData) {
+
+		this.checkLiteral(literalData, false);
+
+		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), literalData);
 
 		// Zephyr request
 
@@ -363,34 +397,28 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		StringBuilder contextNodePath = new StringBuilder();
 
-		try {
+		if (this.isRootContextNode()) {
 
-			if (this.isRootContextNode()) {
+		} else {
 
-			} else {
+			contextNodePath.append("/" + ZephyrUtils.encode(this.getArcXri().toString()));
 
-				contextNodePath.append(URLEncoder.encode(this.getArcXri().toString(), "UTF-8"));
+			for (ContextNode contextNode = this.getContextNode(); 
+					contextNode != null && ! contextNode.isRootContextNode(); 
+					contextNode = contextNode.getContextNode()) {
 
-				for (ContextNode contextNode = this.getContextNode(); 
-						contextNode != null && ! contextNode.isRootContextNode(); 
-						contextNode = contextNode.getContextNode()) {
-
-					contextNodePath.insert(0, URLEncoder.encode(contextNode.getArcXri().toString(), "UTF-8") + "/");
-				}
+				contextNodePath.insert(0, "/" + ZephyrUtils.encode(contextNode.getArcXri().toString()));
 			}
+		}
 
-			if (arcXri != null) {
+		if (arcXri != null) {
 
-				contextNodePath.append("/" + URLEncoder.encode(arcXri.toString(), "UTF-8"));
-			}
+			contextNodePath.append("/" + ZephyrUtils.encode(arcXri.toString()));
+		}
 
-			if (star) {
+		if (star) {
 
-				contextNodePath.append("*");
-			}
-		} catch (UnsupportedEncodingException ex) {
-
-			throw new RuntimeException(ex.getMessage(), ex);
+			contextNodePath.append("/*");
 		}
 
 		return contextNodePath.toString();

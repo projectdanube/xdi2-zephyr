@@ -1,8 +1,6 @@
 package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
@@ -49,7 +47,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			return ZephyrUtils.doGet(url(contextNodePath));
+			return ZephyrUtils.doGet(url(graphContextNodePath(contextNodePath)));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP GET: " + ex.getMessage(), ex);
@@ -60,7 +58,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			ZephyrUtils.doPut(url(contextNodePath), json);
+			ZephyrUtils.doPut(url(graphContextNodePath(contextNodePath)), json);
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP PUT: " + ex.getMessage(), ex);
@@ -71,7 +69,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			ZephyrUtils.doPut(url(contextNodePath), key, value);
+			ZephyrUtils.doPut(url(graphContextNodePath(contextNodePath)), key, value);
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP PUT: " + ex.getMessage(), ex);
@@ -82,31 +80,35 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			ZephyrUtils.doDelete(url(contextNodePath));
+			ZephyrUtils.doDelete(url(graphContextNodePath(contextNodePath)));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP DELETE: " + ex.getMessage(), ex);
 		}
 	}
 
-	String url(String contextNodePath) {
+	String graphContextNodePath(String contextNodePath) {
 
-		try {
+		StringBuilder graphContextNodePath = new StringBuilder();
+		
+		if (this.getIdentifier() != null) graphContextNodePath.append("/" + ZephyrUtils.encode(this.getIdentifier()));
+		graphContextNodePath.append(contextNodePath);
+		
+		return graphContextNodePath.toString();
+	}
+	
+	String url(String graphContextNodePath) {
 
-			ZephyrGraphFactory graphFactory = (ZephyrGraphFactory) this.getGraphFactory();
+		ZephyrGraphFactory graphFactory = (ZephyrGraphFactory) this.getGraphFactory();
+		String dataApi = graphFactory.getDataApi();
+		if (dataApi.endsWith("/")) dataApi = dataApi.substring(0, dataApi.length() - 1);
 
-			StringBuilder url = new StringBuilder();
+		StringBuilder url = new StringBuilder();
 
-			url.append(graphFactory.getDataApi());
-			if (! graphFactory.getDataApi().endsWith("/")) url.append("/");
-			if (this.getIdentifier() != null) url.append(URLEncoder.encode(this.getIdentifier(), "UTF-8") + "/");
-			url.append(contextNodePath);
-			url.append("?token=" + graphFactory.getOauthToken());
+		url.append(dataApi);
+		url.append(graphContextNodePath);
+		url.append("?token=" + graphFactory.getOauthToken());
 
-			return url.toString();
-		} catch (UnsupportedEncodingException ex) {
-
-			throw new RuntimeException(ex.getMessage(), ex);
-		}
+		return url.toString();
 	}
 }

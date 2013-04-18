@@ -28,13 +28,15 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	@Override
 	public Graph openGraph(String identifier) throws IOException {
 
+		ZephyrGraph graph = new ZephyrGraph(this, identifier);
+		
 		// Zephyr request
 
-		ZephyrUtils.doPut(getDataApi() + "/" + identifier + "?token=" + getOauthToken(), "", "");
+		graph.doPut("", null, null);
 
 		// done
 
-		return new ZephyrGraph(this, identifier);
+		return graph;
 	}
 
 	public String getDataApi() {
