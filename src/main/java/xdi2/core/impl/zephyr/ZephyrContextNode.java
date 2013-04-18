@@ -172,7 +172,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		this.checkRelation(arcXri, targetContextNode, true);
 
 		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
-		if (array == null) { array = new JSONArray(); this.getJson().put(arcXri.toString(), array); }
+		if (array == null) array = new JSONArray();
 		array.add(targetContextNode.getXri().toString());
 
 		// Zephyr request
@@ -190,7 +190,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		this.checkRelation(arcXri, targetContextNode, false);
 
 		JSONArray array = this.getJson().getJSONArray(arcXri.toString());
-		if (array == null) { array = new JSONArray(); this.getJson().put(arcXri.toString(), array); }
+		if (array == null) array = new JSONArray();
 		if (! array.contains(targetContextNode.getXri().toString())) array.add(targetContextNode.getXri().toString());
 
 		// Zephyr request
@@ -344,7 +344,6 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		this.checkLiteral(literalData, true);
 
 		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
-		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), array);
 
 		// Zephyr request
 
@@ -361,7 +360,6 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		this.checkLiteral(literalData, false);
 
 		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
-		this.getJson().put(XDIConstants.XRI_S_LITERAL.toString(), array);
 
 		// Zephyr request
 

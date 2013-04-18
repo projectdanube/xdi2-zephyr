@@ -1,5 +1,9 @@
 package xdi2.core.impl.zephyr;
 
+import java.util.Collections;
+
+import com.alibaba.fastjson.JSONArray;
+
 import xdi2.core.Literal;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.impl.AbstractLiteral;
@@ -28,8 +32,10 @@ public class ZephyrLiteral extends AbstractLiteral implements Literal {
 
 		this.literalData = literalData;
 
+		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
+
 		// Zephyr request
 
-		((ZephyrGraph) this.getGraph()).doPut(((ZephyrContextNode) this.getContextNode()).contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), literalData);
+		((ZephyrGraph) this.getGraph()).doPut(((ZephyrContextNode) this.getContextNode()).contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), array);
 	}
 }
