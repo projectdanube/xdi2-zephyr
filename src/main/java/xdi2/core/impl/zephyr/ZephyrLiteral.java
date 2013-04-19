@@ -1,12 +1,11 @@
 package xdi2.core.impl.zephyr;
 
-import java.util.Collections;
-
-import com.alibaba.fastjson.JSONArray;
-
 import xdi2.core.Literal;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.impl.AbstractLiteral;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonPrimitive;
 
 public class ZephyrLiteral extends AbstractLiteral implements Literal {
 
@@ -32,7 +31,8 @@ public class ZephyrLiteral extends AbstractLiteral implements Literal {
 
 		this.literalData = literalData;
 
-		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(literalData));
 
 		// Zephyr request
 

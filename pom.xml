@@ -169,7 +169,26 @@
 			<artifactId>xdi2-core</artifactId>
 			<version>0.1-SNAPSHOT</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>xdi2</groupId>
+			<artifactId>xdi2-core</artifactId>
+			<version>0.1-SNAPSHOT</version>
 			<classifier>test</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>xdi2</groupId>
+			<artifactId>xdi2-messaging</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>xdi2</groupId>
+			<artifactId>xdi2-messaging</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<classifier>test</classifier>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -263,13 +282,7 @@
 			<dependencies>
 				<dependency>
 					<groupId>xdi2</groupId>
-					<artifactId>xdi2-client</artifactId>
-					<version>0.1-SNAPSHOT</version>
-					<scope>compile</scope>
-				</dependency>
-				<dependency>
-					<groupId>xdi2</groupId>
-					<artifactId>xdi2-server</artifactId>
+					<artifactId>xdi2-core</artifactId>
 					<version>0.1-SNAPSHOT</version>
 					<scope>compile</scope>
 				</dependency>
@@ -332,13 +345,7 @@
 			<dependencies>
 				<dependency>
 					<groupId>xdi2</groupId>
-					<artifactId>xdi2-client</artifactId>
-					<version>0.1-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>xdi2</groupId>
-					<artifactId>xdi2-server</artifactId>
+					<artifactId>xdi2-core</artifactId>
 					<version>0.1-SNAPSHOT</version>
 					<scope>provided</scope>
 				</dependency>

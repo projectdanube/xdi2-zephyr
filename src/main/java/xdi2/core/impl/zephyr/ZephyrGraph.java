@@ -1,32 +1,43 @@
 package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
+import java.util.Map.Entry;
 
 import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.exceptions.Xdi2GraphException;
 import xdi2.core.impl.AbstractGraph;
 
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class ZephyrGraph extends AbstractGraph implements Graph {
 
 	private static final long serialVersionUID = -8716740616499117574L;
 
 	private String identifier;
-	private Ehcache cache;
+
+	private String dataApi;
+	private String oauthToken;
+	private Ehcache ehcache;
+	private ZephyrUtils zephyrUtils;
 
 	private ZephyrContextNode rootContextNode;
 
-	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, Ehcache cache) {
+	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, String dataApi, String oauthToken, Ehcache ehcache, ZephyrUtils zephyrUtils) {
 
 		super(graphFactory);
 
 		this.identifier = identifier;
-		this.cache = cache;
 
-		this.rootContextNode = new ZephyrContextNode(this, null, null, null);
+		this.dataApi = dataApi;
+		this.oauthToken = oauthToken;
+		this.ehcache = ehcache;
+		this.zephyrUtils = zephyrUtils;
+
+		this.rootContextNode = new ZephyrContextNode(this, null, null);
 	}
 
 	@Override
@@ -46,52 +57,126 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 		return this.identifier;
 	}
 
-	public Ehcache getEhcache() {
+	public String getDataApi() {
 
-		return this.cache;
+		return this.dataApi;
 	}
 
-	JSONObject doGet(String contextNodePath) throws Xdi2GraphException {
+	public String getOauthToken() {
+
+		return this.oauthToken;
+	}
+
+	public Ehcache getEhcache() {
+
+		return this.ehcache;
+	}
+
+	public ZephyrUtils getZephyrUtils() {
+
+		return this.zephyrUtils;
+	}
+
+	JsonObject doGet(String contextNodePath) throws Xdi2GraphException {
+
+		String graphContextNodePath = this.graphContextNodePath(contextNodePath);
+
+		// cache
+
+		if (this.getEhcache() != null) {
+
+			Element element = this.getEhcache().get(graphContextNodePath);
+			JsonObject cachedJson = element == null ? null : (JsonObject) element.getObjectValue();
+			if (cachedJson != null) return cachedJson;
+		}
+
+		// http
+
+		JsonObject json;
 
 		try {
 
-			return ZephyrUtils.doGet(url(graphContextNodePath(contextNodePath)));
+			json = this.getZephyrUtils().doGet(url(graphContextNodePath));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP GET: " + ex.getMessage(), ex);
 		}
+
+		// cache
+
+		if (this.getEhcache() != null) {
+
+			this.getEhcache().put(new Element(graphContextNodePath, json));
+		}
+
+		// done
+
+		return json;
 	}
 
-	void doPut(String contextNodePath, JSONObject json) throws Xdi2GraphException {
+	void doPut(String contextNodePath, JsonObject json) throws Xdi2GraphException {
+
+		String graphContextNodePath = this.graphContextNodePath(contextNodePath);
+
+		// http
 
 		try {
 
-			ZephyrUtils.doPut(url(graphContextNodePath(contextNodePath)), json);
+			this.getZephyrUtils().doPut(this.url(graphContextNodePath), json);
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP PUT: " + ex.getMessage(), ex);
 		}
+
+		// cache
+
+		if (this.getEhcache() != null) {
+
+			Element element = this.getEhcache().get(graphContextNodePath);
+			JsonObject cachedJson = element == null ? null : (JsonObject) element.getObjectValue();
+
+			if (cachedJson != null) {
+
+				for (Entry<String, JsonElement> entry : json.entrySet()) {
+
+					cachedJson.add(entry.getKey(), entry.getValue());
+				}
+
+				this.getEhcache().put(new Element(graphContextNodePath, cachedJson));
+			} else {
+				
+				this.getEhcache().put(new Element(graphContextNodePath, json));
+			}
+		}
 	}
 
-	void doPut(String contextNodePath, String key, Object value) throws Xdi2GraphException {
+	void doPut(String contextNodePath, String key, JsonElement value) throws Xdi2GraphException {
 
-		try {
+		JsonObject json = new JsonObject();
+		if (key != null) json.add(key, value);
 
-			ZephyrUtils.doPut(url(graphContextNodePath(contextNodePath)), key, value);
-		} catch (IOException ex) {
-
-			throw new Xdi2GraphException("Problem with HTTP PUT: " + ex.getMessage(), ex);
-		}
+		this.doPut(contextNodePath, json);
 	}
 
 	void doDelete(String contextNodePath) throws Xdi2GraphException {
 
+		String graphContextNodePath = this.graphContextNodePath(contextNodePath);
+
+		// http
+
 		try {
 
-			ZephyrUtils.doDelete(url(graphContextNodePath(contextNodePath)));
+			this.getZephyrUtils().doDelete(this.url(graphContextNodePath));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP DELETE: " + ex.getMessage(), ex);
+		}
+
+		// cache
+
+		if (this.getEhcache() != null) {
+
+			this.getEhcache().remove(graphContextNodePath);
 		}
 	}
 
@@ -107,15 +192,14 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 	String url(String graphContextNodePath) {
 
-		ZephyrGraphFactory graphFactory = (ZephyrGraphFactory) this.getGraphFactory();
-		String dataApi = graphFactory.getDataApi();
+		String dataApi = this.getDataApi();
 		if (dataApi.endsWith("/")) dataApi = dataApi.substring(0, dataApi.length() - 1);
 
 		StringBuilder url = new StringBuilder();
 
 		url.append(dataApi);
 		url.append(graphContextNodePath);
-		url.append("?token=" + graphFactory.getOauthToken());
+		url.append("?token=" + this.getOauthToken());
 
 		return url.toString();
 	}

@@ -1,12 +1,16 @@
 package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
@@ -17,23 +21,31 @@ import org.apache.http.impl.conn.BasicClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class ZephyrUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ZephyrUtils.class);
 
-	private static DefaultHttpClient httpClient;
+	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+	private static final JsonParser jsonParser = new JsonParser();
 
-	static {
+	private DefaultHttpClient httpClient;
+	private List<String> httpLog;
 
-		httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
+	public ZephyrUtils() {
+		
+		this.httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
+		this.httpLog = new ArrayList<String> ();
 	}
 
-	public static JSONObject doGet(String url) throws IOException {
+	public JsonObject doGet(String url) throws IOException {
+
+		this.getHttpLog().add("GET " + url);
 
 		HttpGet request = null;
 		HttpResponse response = null;
@@ -43,23 +55,25 @@ public class ZephyrUtils {
 			request = new HttpGet(url);
 			log.debug("HTTP GET: " + url);
 
-			response = httpClient.execute(request);
+			response = this.httpClient.execute(request);
 			log.debug("HTTP GET RESPONSE: " + response.getStatusLine());
 
-			if (HttpStatus.valueOf(response.getStatusLine().getStatusCode()).equals(HttpStatus.NOT_FOUND)) return null;
-			if (! HttpStatus.valueOf(response.getStatusLine().getStatusCode()).series().equals(HttpStatus.Series.SUCCESSFUL)) throw new IOException("HTTP error: " + response.getStatusLine().getReasonPhrase());
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) return null;
+			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) throw new IOException("HTTP error " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
 
 			String body = EntityUtils.toString(response.getEntity());
 			log.debug("HTTP GET BODY: " + body);
 
-			return JSON.parseObject(body);
+			return (JsonObject) jsonParser.parse(new StringReader(body));
 		} finally {
 
 			if (response != null) EntityUtils.consume(response.getEntity());
 		}
 	}
 
-	public static void doPut(String url, JSONObject json) throws IOException {
+	public void doPut(String url, JsonObject jsonObject) throws IOException {
+
+		this.getHttpLog().add("PUT " + url);
 
 		HttpEntity entity = null;
 		HttpPut request = null;
@@ -67,7 +81,7 @@ public class ZephyrUtils {
 
 		try {
 
-			String body = json.toJSONString();
+			String body = gson.toJson(jsonObject);
 			log.debug("HTTP PUT BODY: " + body);
 
 			entity = new StringEntity(body, ContentType.create("application/json"));
@@ -77,23 +91,19 @@ public class ZephyrUtils {
 			log.debug("HTTP PUT: " + url);
 			request.setEntity(entity);
 
-			response = httpClient.execute(request);
+			response = this.httpClient.execute(request);
 			log.debug("HTTP PUT RESPONSE: " + response.getStatusLine());
+
+			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_NO_CONTENT) throw new IOException("HTTP error " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
 		} finally {
 
 			if (response != null) EntityUtils.consume(response.getEntity());
 		}
 	}
 
-	public static void doPut(String url, String key, Object value) throws IOException {
+	public void doDelete(String url) throws IOException {
 
-		JSONObject json = new JSONObject();
-		if (key != null) json.put(key, value);
-
-		doPut(url, json);
-	}
-
-	public static void doDelete(String url) throws IOException {
+		this.getHttpLog().add("DELETE " + url);
 
 		HttpDelete request = null;
 		HttpResponse response = null;
@@ -103,21 +113,31 @@ public class ZephyrUtils {
 			request = new HttpDelete(url);
 			log.debug("HTTP DELETE: " + url);
 
-			response = httpClient.execute(request);
+			response = this.httpClient.execute(request);
 			log.debug("HTTP DELETE RESPONSE: " + response.getStatusLine());
 
-			EntityUtils.consume(response.getEntity());
+			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_NO_CONTENT) throw new IOException("HTTP error " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
 		} finally {
 
 			if (response != null) EntityUtils.consume(response.getEntity());
 		}
 	}
 
+	public DefaultHttpClient getHttpClient() {
+	
+		return this.httpClient;
+	}
+
+	public List<String> getHttpLog() {
+	
+		return this.httpLog;
+	}
+
 	public static String encode(String string) {
 
 		try {
 
-			return URLEncoder.encode(string, "UTF-8").replace("-", "%2D").replace(".", "%2E").replace("%", "-");
+			return URLEncoder.encode(string, "UTF-8").replace("-", "%2D").replace("%", "-");
 		} catch (UnsupportedEncodingException ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);

@@ -17,26 +17,34 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
 	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
+	public static final Ehcache DEFAULT_EHCACHE;
+	public static final ZephyrUtils DEFAULT_ZEPHYR_UTILS;
+
+	static {
+
+		DEFAULT_EHCACHE = CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getEhcache("ZephyrGraphFactory_DEFAULT_EHCACHE");
+		DEFAULT_ZEPHYR_UTILS = new ZephyrUtils();
+	}
 
 	private String dataApi;
 	private String oauthToken;
+	private Ehcache ehcache; 
+	private ZephyrUtils zephyrUtils;
 
 	public ZephyrGraphFactory() {
 
 		this.dataApi = DEFAULT_DATA_API;
 		this.oauthToken = DEFAULT_OAUTH_TOKEN;
+		this.ehcache = DEFAULT_EHCACHE;
+		this.zephyrUtils = DEFAULT_ZEPHYR_UTILS;
 	}
 
 	@Override
 	public Graph openGraph(String identifier) throws IOException {
 
-		// create cache
-
-		Ehcache cache = CacheManager.getInstance().addCacheIfAbsent(identifier);
-
 		// create graph
 
-		ZephyrGraph graph = new ZephyrGraph(this, identifier, cache);
+		ZephyrGraph graph = new ZephyrGraph(this, identifier, this.getDataApi(), this.getOauthToken(), this.getEhcache(), this.getZephyrUtils());
 
 		// Zephyr request
 
@@ -65,5 +73,25 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	public void setOauthToken(String oauthToken) {
 
 		this.oauthToken = oauthToken;
+	}
+
+	public Ehcache getEhcache() {
+
+		return this.ehcache;
+	}
+
+	public void setEhcache(Ehcache ehcache) {
+
+		this.ehcache = ehcache;
+	}
+
+	public ZephyrUtils getZephyrUtils() {
+	
+		return this.zephyrUtils;
+	}
+
+	public void setZephyrUtils(ZephyrUtils zephyrUtils) {
+	
+		this.zephyrUtils = zephyrUtils;
 	}
 }

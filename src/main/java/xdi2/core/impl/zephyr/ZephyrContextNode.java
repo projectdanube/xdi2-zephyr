@@ -1,6 +1,5 @@
 package xdi2.core.impl.zephyr;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -15,13 +14,16 @@ import xdi2.core.exceptions.Xdi2GraphException;
 import xdi2.core.impl.AbstractContextNode;
 import xdi2.core.util.iterators.CompositeIterator;
 import xdi2.core.util.iterators.EmptyIterator;
+import xdi2.core.util.iterators.IteratorContains;
 import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.core.util.iterators.SelectingMappingIterator;
 import xdi2.core.xri3.XDI3Segment;
 import xdi2.core.xri3.XDI3SubSegment;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class ZephyrContextNode extends AbstractContextNode implements ContextNode {
 
@@ -31,7 +33,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 	private XDI3SubSegment arcXri;
 
-	ZephyrContextNode(ZephyrGraph graph, ZephyrContextNode contextNode, XDI3SubSegment arcXri, JSONObject json) {
+	ZephyrContextNode(ZephyrGraph graph, ZephyrContextNode contextNode, XDI3SubSegment arcXri) {
 
 		super(graph, contextNode);
 
@@ -57,7 +59,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// done
 
-		return new ZephyrContextNode((ZephyrGraph) this.getGraph(), this, arcXri, null);
+		return new ZephyrContextNode((ZephyrGraph) this.getGraph(), this, arcXri);
 	}
 
 	@Override
@@ -71,7 +73,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// done
 
-		return new ZephyrContextNode((ZephyrGraph) this.getGraph(), this, arcXri, null);
+		return new ZephyrContextNode((ZephyrGraph) this.getGraph(), this, arcXri);
 	}
 
 	@Override
@@ -79,12 +81,12 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(contextNodeArcXri, false));
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(contextNodeArcXri, false));
 		if (json == null) return null;
 
 		// done
 
-		return new ZephyrContextNode((ZephyrGraph) this.getGraph(), this, contextNodeArcXri, json);
+		return new ZephyrContextNode((ZephyrGraph) this.getGraph(), this, contextNodeArcXri);
 	}
 
 	@Override
@@ -92,19 +94,19 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		final JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(true));
+		final JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(true));
 		if (json == null) return new EmptyIterator<ContextNode> ();
 
 		// parsing
 
 		final String prefix = ((ZephyrGraph) this.getGraph()).graphContextNodePath(this.contextNodePath(false)) + "/";
 
-		Iterator<Entry<String, Object>> entries = json.entrySet().iterator();
+		Iterator<Entry<String, JsonElement>> entries = json.entrySet().iterator();
 
-		return new SelectingMappingIterator<Entry<String, Object>, ContextNode> (entries) {
+		return new SelectingMappingIterator<Entry<String, JsonElement>, ContextNode> (entries) {
 
 			@Override
-			public boolean select(Entry<String, Object> entry) {
+			public boolean select(Entry<String, JsonElement> entry) {
 
 				if (! entry.getKey().startsWith(prefix)) {
 
@@ -116,7 +118,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 					return false;
 				}
 
-				if (! (entry.getValue() instanceof JSONObject)) {
+				if (! (entry.getValue() instanceof JsonObject)) {
 
 					log.warn("Invalid value in JSON object: " + entry.getValue() + " (not a JSON object)");
 					return false;
@@ -126,12 +128,11 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			}
 
 			@Override
-			public ContextNode map(Entry<String, Object> entry) {
+			public ContextNode map(Entry<String, JsonElement> entry) {
 
 				XDI3SubSegment arcXri = XDI3SubSegment.create(ZephyrUtils.decode(entry.getKey().substring(prefix.length())));
-				JSONObject innerJson = (JSONObject) entry.getValue();
 
-				return new ZephyrContextNode((ZephyrGraph) ZephyrContextNode.this.getGraph(), ZephyrContextNode.this, arcXri, innerJson);
+				return new ZephyrContextNode((ZephyrGraph) ZephyrContextNode.this.getGraph(), ZephyrContextNode.this, arcXri);
 			}
 		};
 	}
@@ -166,13 +167,13 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
 
 		// manipulation
 
-		JSONArray array = json.getJSONArray(arcXri.toString());
-		if (array == null) array = new JSONArray();
-		array.add(targetContextNode.getXri().toString());
+		JsonArray array = (JsonArray) json.get(arcXri.toString());
+		if (array == null) array = new JsonArray();
+		array.add(new JsonPrimitive(targetContextNode.getXri().toString()));
 
 		// Zephyr request
 
@@ -190,13 +191,14 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
 
 		// manipulation
 
-		JSONArray array = json.getJSONArray(arcXri.toString());
-		if (array == null) array = new JSONArray();
-		if (! array.contains(targetContextNode.getXri().toString())) array.add(targetContextNode.getXri().toString());
+		JsonArray array = (JsonArray) json.get(arcXri.toString());
+		if (array == null) array = new JsonArray();
+		Iterator<JsonElement> iterator = array.iterator();
+		if (! new IteratorContains<JsonElement> (iterator, new JsonPrimitive(targetContextNode.getXri().toString())).contains()) array.add(new JsonPrimitive(targetContextNode.getXri().toString()));
 
 		// Zephyr request
 
@@ -212,13 +214,14 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
 
 		// manipulation
 
-		JSONArray array = json.getJSONArray(arcXri.toString());
+		JsonArray array = (JsonArray) json.get(arcXri.toString());
 		if (array == null) return null;
-		if (! array.contains(targetContextNodeXri.toString())) return null;
+		Iterator<JsonElement> iterator = array.iterator();
+		if (! new IteratorContains<JsonElement> (iterator, new JsonPrimitive(targetContextNodeXri.toString())).contains()) return null;
 
 		// done
 
@@ -230,21 +233,21 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
 
 		// parsing
 
-		JSONArray array = json.getJSONArray(arcXri.toString());
+		JsonArray array = (JsonArray) json.get(arcXri.toString());
 		if (array == null) return new EmptyIterator<Relation> ();
 
-		return new SelectingMappingIterator<Object, Relation> (array.iterator()) {
+		return new SelectingMappingIterator<JsonElement, Relation> (array.iterator()) {
 
 			@Override
-			public boolean select(Object object) {
+			public boolean select(JsonElement element) {
 
-				if (! (object instanceof String)) {
+				if (! (element instanceof JsonPrimitive) || ! ((JsonPrimitive) element).isString()) {
 
-					log.warn("Invalid element in JSON array: " + object + " (not a string)");
+					log.warn("Invalid element in JSON array: " + element + " (not a string)");
 					return false;
 				}
 
@@ -252,9 +255,9 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			}
 
 			@Override
-			public Relation map(Object object) {
+			public Relation map(JsonElement element) {
 
-				XDI3Segment targetContextNodeXri = XDI3Segment.create((String) object);
+				XDI3Segment targetContextNodeXri = XDI3Segment.create(((JsonPrimitive) element).getAsString());
 
 				return new ZephyrRelation(ZephyrContextNode.this, arcXri, targetContextNodeXri);
 			}
@@ -266,25 +269,25 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
 
 		// parsing
 
-		Iterator<Entry<String, Object>> entries = json.entrySet().iterator();
+		Iterator<Entry<String, JsonElement>> entries = json.entrySet().iterator();
 
-		return new CompositeIterator<Relation> (new SelectingMappingIterator<Entry<String, Object>, Iterator<? extends Relation>> (entries) {
+		return new CompositeIterator<Relation> (new SelectingMappingIterator<Entry<String, JsonElement>, Iterator<? extends Relation>> (entries) {
 
 			@Override
-			public boolean select(Entry<String, Object> entry) {
+			public boolean select(Entry<String, JsonElement> entry) {
 
 				if (XDIConstants.XRI_SS_LITERAL.toString().equals(entry.getKey())) {
 
 					return false;
 				}
 
-				if (! (entry.getValue() instanceof JSONArray)) {
+				if (! (entry.getValue() instanceof JsonArray)) {
 
-					log.warn("Invalid value in JSON object: " + entry.getValue() + " (not a JSONArray)");
+					log.warn("Invalid value in JSON object: " + entry.getValue() + " (not a JSON array)");
 					return false;
 				}
 
@@ -292,19 +295,19 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			}
 
 			@Override
-			public Iterator<? extends Relation> map(Entry<String, Object> entry) {
+			public Iterator<? extends Relation> map(Entry<String, JsonElement> entry) {
 
 				final XDI3Segment arcXri = XDI3Segment.create(entry.getKey());
-				JSONArray innerJson = (JSONArray) entry.getValue();
+				JsonArray innerJson = (JsonArray) entry.getValue();
 
-				return new SelectingMappingIterator<Object, Relation> (innerJson.iterator()) {
+				return new SelectingMappingIterator<JsonElement, Relation> (innerJson.iterator()) {
 
 					@Override
-					public boolean select(Object object) {
+					public boolean select(JsonElement element) {
 
-						if (object instanceof JSONArray) {
+						if (! (element instanceof JsonPrimitive) || ! ((JsonPrimitive) element).isString()) {
 
-							log.warn("Invalid element in JSON array: " + object + " (not a string)");
+							log.warn("Invalid element in JSON array: " + element + " (not a string)");
 							return false;
 						}
 
@@ -312,9 +315,9 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 					}
 
 					@Override
-					public Relation map(Object object) {
+					public Relation map(JsonElement element) {
 
-						XDI3Segment targetContextNodeXri = XDI3Segment.create((String) object);
+						XDI3Segment targetContextNodeXri = XDI3Segment.create(((JsonPrimitive) element).getAsString());
 
 						return new ZephyrRelation(ZephyrContextNode.this, arcXri, targetContextNodeXri);
 					}
@@ -328,13 +331,14 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
 
 		// manipulation
 
-		JSONArray array = json.getJSONArray(arcXri.toString());
-		if (! array.contains(targetContextNodeXri.toString())) return;
-		array.remove(targetContextNodeXri.toString());
+		JsonArray array = (JsonArray) json.get(arcXri.toString());
+		Iterator<JsonElement> iterator = array.iterator();
+		if (! new IteratorContains<JsonElement> (iterator, new JsonPrimitive(targetContextNodeXri.toString())).contains()) return;
+		iterator.remove();
 
 		// Zephyr request
 
@@ -344,15 +348,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteRelations(XDI3Segment arcXri) {
 
-		// Zephyr request
-
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
-
-		// manipulation
-
-		JSONArray array = json.getJSONArray(arcXri.toString());
-		if (array == null) return;
-		array.clear();
+		JsonArray array = new JsonArray();
 
 		// Zephyr request
 
@@ -372,7 +368,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		this.checkLiteral(literalData, true);
 
-		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(literalData));
 
 		// Zephyr request
 
@@ -388,7 +385,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		this.checkLiteral(literalData, false);
 
-		JSONArray array = new JSONArray(Collections.singletonList((Object) literalData));
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(literalData));
 
 		// Zephyr request
 
@@ -404,13 +402,13 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
 
 		// manipulation
 
-		JSONArray array = json.getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
-		if (array == null || array.size() < 1) return null;
-		String literalData = array.getString(0);
+		JsonArray array = (JsonArray) json.get(XDIConstants.XRI_S_LITERAL.toString());
+		if (array == null || array.size() < 1 || ! (array.get(0) instanceof JsonPrimitive) || ! ((JsonPrimitive) array.get(0)).isString()) return null;
+		String literalData = ((JsonPrimitive) array.get(0)).getAsString();
 
 		// done
 
@@ -420,15 +418,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	@Override
 	public void deleteLiteral() {
 
-		// Zephyr request
-
-		JSONObject json = ((ZephyrGraph) this.getGraph()).doGet(this.contextNodePath(false)); 
-
-		// manipulation
-
-		JSONArray array = json.getJSONArray(XDIConstants.XRI_S_LITERAL.toString());
-		if (array == null) return;
-		array.clear();
+		JsonArray array = new JsonArray();
 
 		// Zephyr request
 

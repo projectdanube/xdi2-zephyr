@@ -1,12 +1,12 @@
-package xdi2.tests.core.impl;
+package xdi2.messaging.tests.messagingtarget;
 
 import java.io.IOException;
 
 import xdi2.core.Graph;
 import xdi2.core.impl.zephyr.ZephyrGraphFactory;
-import xdi2.tests.core.graph.AbstractGraphTest;
+import xdi2.core.impl.zephyr.ZephyrUtils;
 
-public class ZephyrGraphTest extends AbstractGraphTest {
+public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTargetTest {
 
 	private static ZephyrGraphFactory graphFactory = new ZephyrGraphFactory();
 
@@ -16,15 +16,6 @@ public class ZephyrGraphTest extends AbstractGraphTest {
 	static {
 
 		cleanup();
-
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-
-			@Override
-			public void run() {
-
-				System.err.println(ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.getHttpLog().size());
-			}
-		});
 	}
 
 	public static void cleanup() {
@@ -34,7 +25,7 @@ public class ZephyrGraphTest extends AbstractGraphTest {
 
 		try {
 
-			ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.doDelete(URL + "/?token=" + TOKEN);
+//			ZephyrUtils.doDelete(URL + "/?token=" + TOKEN);
 		} catch (Exception ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
@@ -43,14 +34,6 @@ public class ZephyrGraphTest extends AbstractGraphTest {
 
 	@Override
 	protected Graph openNewGraph(String identifier) throws IOException {
-
-		return graphFactory.openGraph(identifier);
-	}
-
-	@Override
-	protected Graph reopenGraph(Graph graph, String identifier) throws IOException {
-
-		graph.close();
 
 		return graphFactory.openGraph(identifier);
 	}
