@@ -38,7 +38,7 @@ public class ZephyrUtils {
 	private List<String> httpLog;
 
 	public ZephyrUtils() {
-		
+
 		this.httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
 		this.httpLog = new ArrayList<String> ();
 	}
@@ -124,12 +124,12 @@ public class ZephyrUtils {
 	}
 
 	public DefaultHttpClient getHttpClient() {
-	
+
 		return this.httpClient;
 	}
 
 	public List<String> getHttpLog() {
-	
+
 		return this.httpLog;
 	}
 

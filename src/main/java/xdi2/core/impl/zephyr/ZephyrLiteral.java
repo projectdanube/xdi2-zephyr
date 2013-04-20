@@ -29,13 +29,15 @@ public class ZephyrLiteral extends AbstractLiteral implements Literal {
 	@Override
 	public void setLiteralData(String literalData) {
 
-		this.literalData = literalData;
-
 		JsonArray array = new JsonArray();
 		array.add(new JsonPrimitive(literalData));
 
 		// Zephyr request
 
-		((ZephyrGraph) this.getGraph()).doPut(((ZephyrContextNode) this.getContextNode()).contextNodePath(false), XDIConstants.XRI_S_LITERAL.toString(), array);
+		((ZephyrGraph) this.getGraph()).doPut(ZephyrContextNode.contextNodePath(this.getContextNode(), false), XDIConstants.XRI_S_LITERAL.toString(), array);
+
+		// done
+
+		this.literalData = literalData;
 	}
 }
