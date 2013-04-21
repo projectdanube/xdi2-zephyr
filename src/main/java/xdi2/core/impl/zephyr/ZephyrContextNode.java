@@ -11,6 +11,7 @@ import xdi2.core.Literal;
 import xdi2.core.Relation;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.impl.AbstractContextNode;
+import xdi2.core.impl.zephyr.util.ZephyrConnection;
 import xdi2.core.util.iterators.CompositeIterator;
 import xdi2.core.util.iterators.EmptyIterator;
 import xdi2.core.util.iterators.IteratorContains;
@@ -126,7 +127,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			@Override
 			public ContextNode map(Entry<String, JsonElement> entry) {
 
-				XDI3SubSegment arcXri = XDI3SubSegment.create(ZephyrUtils.decode(entry.getKey().substring(prefix.length())));
+				XDI3SubSegment arcXri = XDI3SubSegment.create(ZephyrConnection.decode(entry.getKey().substring(prefix.length())));
 
 				return new ZephyrContextNode((ZephyrGraph) ZephyrContextNode.this.getGraph(), ZephyrContextNode.this, arcXri);
 			}
@@ -537,13 +538,13 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 			for (XDI3SubSegment contextNodeArcXri : contextNodeXri.getSubSegments()) {
 
-				contextNodePath.append("/" + ZephyrUtils.encode(contextNodeArcXri.toString()));
+				contextNodePath.append("/" + ZephyrConnection.encode(contextNodeArcXri.toString()));
 			}
 		}
 
 		if (arcXri != null) {
 
-			contextNodePath.append("/" + ZephyrUtils.encode(arcXri.toString()));
+			contextNodePath.append("/" + ZephyrConnection.encode(arcXri.toString()));
 		}
 
 		if (star) {

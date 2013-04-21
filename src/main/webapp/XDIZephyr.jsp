@@ -68,6 +68,8 @@
 		<% if (request.getAttribute("output") != null) { %>
 			Copy&amp;Paste: <textarea style="width: 100px; height: 1.2em; overflow: hidden"><%= request.getAttribute("output") %></textarea>
 		<% } %>
+
+			<input type="button" value="Drump Zephyr Contents" onclick="window.open('<%= request.getAttribute("zephyrUrl") %>')">
 		</p>
 	<% } %>
 

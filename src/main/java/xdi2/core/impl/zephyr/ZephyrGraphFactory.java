@@ -7,6 +7,7 @@ import net.sf.ehcache.Ehcache;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.AbstractGraphFactory;
+import xdi2.core.impl.zephyr.util.ZephyrConnection;
 
 /**
  * GraphFactory that creates graphs in zephyr.
@@ -18,18 +19,18 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
 	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
 	public static final Ehcache DEFAULT_EHCACHE;
-	public static final ZephyrUtils DEFAULT_ZEPHYR_UTILS;
+	public static final ZephyrConnection DEFAULT_ZEPHYR_UTILS;
 
 	static {
 
 		DEFAULT_EHCACHE = null/*CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getEhcache("ZephyrGraphFactory_DEFAULT_EHCACHE")*/;
-		DEFAULT_ZEPHYR_UTILS = new ZephyrUtils();
+		DEFAULT_ZEPHYR_UTILS = new ZephyrConnection();
 	}
 
 	private String dataApi;
 	private String oauthToken;
 	private Ehcache ehcache; 
-	private ZephyrUtils zephyrUtils;
+	private ZephyrConnection zephyrUtils;
 
 	public ZephyrGraphFactory() {
 
@@ -89,12 +90,12 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		this.ehcache = ehcache;
 	}
 
-	public ZephyrUtils getZephyrUtils() {
+	public ZephyrConnection getZephyrUtils() {
 
 		return this.zephyrUtils;
 	}
 
-	public void setZephyrUtils(ZephyrUtils zephyrUtils) {
+	public void setZephyrUtils(ZephyrConnection zephyrUtils) {
 
 		this.zephyrUtils = zephyrUtils;
 	}

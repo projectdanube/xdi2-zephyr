@@ -9,6 +9,7 @@ import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.exceptions.Xdi2GraphException;
 import xdi2.core.impl.AbstractGraph;
+import xdi2.core.impl.zephyr.util.ZephyrConnection;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,11 +29,11 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	private String dataApi;
 	private String oauthToken;
 	private Ehcache ehcache;
-	private ZephyrUtils zephyrUtils;
+	private ZephyrConnection zephyrUtils;
 
 	private ZephyrContextNode rootContextNode;
 
-	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, String dataApi, String oauthToken, Ehcache ehcache, ZephyrUtils zephyrUtils) {
+	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, String dataApi, String oauthToken, Ehcache ehcache, ZephyrConnection zephyrUtils) {
 
 		super(graphFactory);
 
@@ -78,7 +79,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 		return this.ehcache;
 	}
 
-	public ZephyrUtils getZephyrUtils() {
+	public ZephyrConnection getZephyrUtils() {
 
 		return this.zephyrUtils;
 	}
@@ -196,7 +197,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		StringBuilder graphContextNodePath = new StringBuilder();
 
-		if (this.getIdentifier() != null) graphContextNodePath.append("/" + ZephyrUtils.encode(this.getIdentifier()));
+		if (this.getIdentifier() != null) graphContextNodePath.append("/" + ZephyrConnection.encode(this.getIdentifier()));
 		graphContextNodePath.append(contextNodePath);
 
 		return graphContextNodePath.toString();

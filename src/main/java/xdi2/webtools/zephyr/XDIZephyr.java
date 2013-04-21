@@ -24,7 +24,8 @@ import xdi2.client.XDIClient;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.http.XDIHttpClient;
 import xdi2.core.impl.memory.MemoryGraphFactory;
-import xdi2.core.impl.zephyr.ZephyrUtils;
+import xdi2.core.impl.zephyr.ZephyrGraph;
+import xdi2.core.impl.zephyr.util.ZephyrConnection;
 import xdi2.core.io.XDIReader;
 import xdi2.core.io.XDIReaderRegistry;
 import xdi2.core.io.XDIWriter;
@@ -43,7 +44,8 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 	private static List<String> sampleInputs;
 	private static String sampleEndpoint;
 
-	private ZephyrUtils zephyrUtils;
+	private ZephyrGraph graph;
+	private ZephyrConnection zephyrUtils;
 
 	static {
 
@@ -122,6 +124,7 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 		String output = "";
 		String stats = "-1";
 		String httpLog = "";
+		String zephyrUrl = "";
 		String error = null;
 
 		Properties xdiResultWriterParameters = new Properties();
@@ -193,6 +196,11 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 
 		httpLog = "<pre>" + StringUtils.join(this.getZephyrUtils().getHttpLog(), "\n") + "</pre>";
 
+		zephyrUrl = this.getGraph().getDataApi();
+		if (! zephyrUrl.endsWith("/")) zephyrUrl += "/";
+		zephyrUrl += "*";
+		zephyrUrl += "?token=" + this.getGraph().getOauthToken();
+
 		// display results
 
 		request.setAttribute("sampleInputs", Integer.valueOf(sampleInputs.size()));
@@ -206,17 +214,28 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 		request.setAttribute("output", output);
 		request.setAttribute("stats", stats);
 		request.setAttribute("httpLog", httpLog);
+		request.setAttribute("zephyrUrl", zephyrUrl);
 		request.setAttribute("error", error);
 
 		request.getRequestDispatcher("/XDIZephyr.jsp").forward(request, response);
 	}
 
-	public ZephyrUtils getZephyrUtils() {
+	public ZephyrGraph getGraph() {
+
+		return this.graph;
+	}
+
+	public void setGraph(ZephyrGraph graph) {
+
+		this.graph = graph;
+	}
+
+	public ZephyrConnection getZephyrUtils() {
 
 		return this.zephyrUtils;
 	}
 
-	public void setZephyrUtils(ZephyrUtils zephyrUtils) {
+	public void setZephyrUtils(ZephyrConnection zephyrUtils) {
 
 		this.zephyrUtils = zephyrUtils;
 	}

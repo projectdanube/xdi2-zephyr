@@ -32,6 +32,7 @@
 	<!-- WEB SERVLET -->
 
 	<bean id="XDIZephyr" class="xdi2.webtools.zephyr.XDIZephyr" init-method="init" destroy-method="destroy">
+		<property name="graph" ref="graph1" />
 		<property name="zephyrUtils" ref="zephyrUtils" />
 	</bean>
 

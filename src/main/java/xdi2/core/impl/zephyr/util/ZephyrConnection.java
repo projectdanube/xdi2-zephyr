@@ -1,13 +1,10 @@
-package xdi2.core.impl.zephyr;
+package xdi2.core.impl.zephyr.util;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -28,25 +25,25 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class ZephyrUtils {
+public class ZephyrConnection {
 
-	private static final Logger log = LoggerFactory.getLogger(ZephyrUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(ZephyrConnection.class);
 
 	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 	private static final JsonParser jsonParser = new JsonParser();
 
 	private DefaultHttpClient httpClient;
-	private List<String> httpLog;
+	private HttpLog httpLog;
 
-	public ZephyrUtils() {
+	public ZephyrConnection() {
 
 		this.httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
-		this.httpLog = new ArrayList<String> ();
+		this.httpLog = new HttpLog();
 	}
 
 	public JsonObject doGet(String url) throws IOException {
 
-		this.addHttpLog("GET", url);
+		if (this.getHttpLog() != null) this.getHttpLog().add("GET", url);
 
 		HttpGet request = null;
 		HttpResponse response = null;
@@ -74,7 +71,7 @@ public class ZephyrUtils {
 
 	public void doPut(String url, JsonObject jsonObject) throws IOException {
 
-		this.addHttpLog("PUT", url);
+		if (this.getHttpLog() != null) this.getHttpLog().add("PUT", url);
 
 		HttpEntity entity = null;
 		HttpPut request = null;
@@ -104,7 +101,7 @@ public class ZephyrUtils {
 
 	public void doDelete(String url) throws IOException {
 
-		this.addHttpLog("DELETE", url);
+		if (this.getHttpLog() != null) this.getHttpLog().add("DELETE", url);
 
 		HttpDelete request = null;
 		HttpResponse response = null;
@@ -129,40 +126,19 @@ public class ZephyrUtils {
 		return this.httpClient;
 	}
 
-	public List<String> getHttpLog() {
+	public void setHttpClient(DefaultHttpClient httpClient) {
+
+		this.httpClient = httpClient;
+	}
+
+	public HttpLog getHttpLog() {
 
 		return this.httpLog;
 	}
 
-	private void addHttpLog(String method, String url) {
+	public void setHttpLog(HttpLog httpLog) {
 
-		StringBuilder builder = new StringBuilder();
-
-		builder.append(method + " " + url + "\n");
-		for (String line : lines()) builder.append("  " + line + "\n");
-		builder.append("\n");
-
-		this.getHttpLog().add(builder.toString());
-	}
-
-	private static List<String> lines() {
-
-		List<String> skipMethods = Arrays.asList(new String[] { "lines", "addHttpLog", "doGet", "doPut", "doDelete" });
-		List<String> lines = new ArrayList<String> ();
-		Exception ex = new Exception();
-
-		for (StackTraceElement stackTraceElement : Arrays.asList(ex.getStackTrace())) {
-
-			String className = stackTraceElement.getClassName();
-			String methodName = stackTraceElement.getMethodName();
-			
-			if (skipMethods.contains(methodName)) continue;
-			if (! className.startsWith("xdi2.core") && ! className.startsWith("xdi2.messaging")) continue;
-
-			lines.add(stackTraceElement.toString());
-		}
-
-		return lines;
+		this.httpLog = httpLog;
 	}
 
 	public static String encode(String string) {
