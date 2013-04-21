@@ -191,7 +191,7 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 		stats = "";
 		stats += Long.toString(stop - start) + " ms time. ";
 		stats += this.getGraph().getZephyrUtils().getHttpLog().getCountGet() + " HTTP GET(s), " + this.getGraph().getZephyrUtils().getHttpLog().getCountPut() + " HTTP PUT(s), " + this.getGraph().getZephyrUtils().getHttpLog().getCountDelete() + " HTTP DELETE(s). ";
-		stats += this.getGraph().getCache().getStatistics().cacheHitCount() + " cache hits. " + this.getGraph().getCache().getStatistics().cacheMissCount() + " cache misses.";
+		if (this.getGraph().getCache() != null) stats += this.getGraph().getCache().getStatistics().cacheHitCount() + " cache hits. " + this.getGraph().getCache().getStatistics().cacheMissCount() + " cache misses.";
 
 		httpLog = "<pre>" + StringUtils.join(this.getGraph().getZephyrUtils().getHttpLog(), "\n") + "</pre>";
 

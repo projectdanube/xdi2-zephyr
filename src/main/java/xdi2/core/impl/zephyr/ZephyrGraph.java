@@ -130,9 +130,6 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 				}
 
 				this.getCache().put(new Element(graphContextNodePath, cachedJson));
-			} else {
-
-				this.getCache().put(new Element(graphContextNodePath, json));
 			}
 		}
 	}
