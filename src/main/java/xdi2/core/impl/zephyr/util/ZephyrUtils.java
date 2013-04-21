@@ -145,7 +145,7 @@ public class ZephyrUtils {
 
 		try {
 
-			return URLEncoder.encode(string, "UTF-8").replace("-", "%2D").replace("%", "-");
+			return URLEncoder.encode(string, "UTF-8");
 		} catch (UnsupportedEncodingException ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
@@ -156,7 +156,7 @@ public class ZephyrUtils {
 
 		try {
 
-			return URLDecoder.decode(string.replace("-", "%"), "UTF-8");
+			return URLDecoder.decode(string, "UTF-8");
 		} catch (UnsupportedEncodingException ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);

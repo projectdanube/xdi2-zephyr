@@ -3,7 +3,8 @@ package xdi2.core.impl.zephyr;
 import java.io.IOException;
 import java.util.UUID;
 
-import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.AbstractGraphFactory;
@@ -18,25 +19,25 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
 	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
-	public static final Ehcache DEFAULT_EHCACHE;
+	public static final Cache DEFAULT_CACHE;
 	public static final ZephyrUtils DEFAULT_ZEPHYR_UTILS;
 
 	static {
 
-		DEFAULT_EHCACHE = null/*CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getEhcache("ZephyrGraphFactory_DEFAULT_EHCACHE")*/;
+		DEFAULT_CACHE = CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getCache("ZephyrGraphFactory_DEFAULT_CACHE");
 		DEFAULT_ZEPHYR_UTILS = new ZephyrUtils();
 	}
 
 	private String dataApi;
 	private String oauthToken;
-	private Ehcache ehcache; 
+	private Cache cache; 
 	private ZephyrUtils zephyrUtils;
 
 	public ZephyrGraphFactory() {
 
 		this.dataApi = DEFAULT_DATA_API;
 		this.oauthToken = DEFAULT_OAUTH_TOKEN;
-		this.ehcache = DEFAULT_EHCACHE;
+		this.cache = DEFAULT_CACHE;
 		this.zephyrUtils = DEFAULT_ZEPHYR_UTILS;
 	}
 
@@ -49,7 +50,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 		// create graph
 
-		ZephyrGraph graph = new ZephyrGraph(this, identifier, this.getDataApi(), this.getOauthToken(), this.getEhcache(), this.getZephyrUtils());
+		ZephyrGraph graph = new ZephyrGraph(this, identifier, this.getDataApi(), this.getOauthToken(), this.getCache(), this.getZephyrUtils());
 
 		// Zephyr request
 
@@ -80,14 +81,14 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		this.oauthToken = oauthToken;
 	}
 
-	public Ehcache getEhcache() {
+	public Cache getCache() {
 
-		return this.ehcache;
+		return this.cache;
 	}
 
-	public void setEhcache(Ehcache ehcache) {
+	public void setCache(Cache cache) {
 
-		this.ehcache = ehcache;
+		this.cache = cache;
 	}
 
 	public ZephyrUtils getZephyrUtils() {

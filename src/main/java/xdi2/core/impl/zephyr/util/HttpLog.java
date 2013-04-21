@@ -25,7 +25,7 @@ public class HttpLog extends ArrayList<String> {
 
 		if ("GET".equals(method)) this.countGet++;
 		if ("PUT".equals(method)) this.countPut++;
-		if ("DELET".equals(method)) this.countDelete++;
+		if ("DELETE".equals(method)) this.countDelete++;
 
 		StringBuilder builder = new StringBuilder();
 
@@ -36,6 +36,16 @@ public class HttpLog extends ArrayList<String> {
 		this.add(builder.toString());
 	}
 
+	@Override
+	public void clear() {
+		
+		super.clear();
+		
+		this.countGet = 0;
+		this.countPut = 0;
+		this.countDelete = 0;
+	}
+	
 	public int getCountGet() {
 
 		return this.countGet;

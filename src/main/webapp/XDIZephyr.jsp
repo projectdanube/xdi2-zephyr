@@ -81,5 +81,6 @@
 		<div class="result"><pre><%= request.getAttribute("output") %></pre></div><br>
 	<% } %>
 
+	</div>	
 </body>
 </html>
