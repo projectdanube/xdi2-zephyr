@@ -1,8 +1,8 @@
 package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
+import java.util.UUID;
 
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
@@ -22,7 +22,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	static {
 
-		DEFAULT_EHCACHE = CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getEhcache("ZephyrGraphFactory_DEFAULT_EHCACHE");
+		DEFAULT_EHCACHE = null/*CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getEhcache("ZephyrGraphFactory_DEFAULT_EHCACHE")*/;
 		DEFAULT_ZEPHYR_UTILS = new ZephyrUtils();
 	}
 
@@ -41,6 +41,10 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	@Override
 	public Graph openGraph(String identifier) throws IOException {
+
+		// no identifier? create UUID
+
+		if (identifier == null) identifier = UUID.randomUUID().toString();
 
 		// create graph
 
@@ -86,12 +90,12 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	}
 
 	public ZephyrUtils getZephyrUtils() {
-	
+
 		return this.zephyrUtils;
 	}
 
 	public void setZephyrUtils(ZephyrUtils zephyrUtils) {
-	
+
 		this.zephyrUtils = zephyrUtils;
 	}
 }

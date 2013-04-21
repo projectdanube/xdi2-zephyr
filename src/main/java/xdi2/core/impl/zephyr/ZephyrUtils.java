@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -45,7 +46,7 @@ public class ZephyrUtils {
 
 	public JsonObject doGet(String url) throws IOException {
 
-		this.getHttpLog().add("GET " + url);
+		this.addHttpLog("GET", url);
 
 		HttpGet request = null;
 		HttpResponse response = null;
@@ -73,7 +74,7 @@ public class ZephyrUtils {
 
 	public void doPut(String url, JsonObject jsonObject) throws IOException {
 
-		this.getHttpLog().add("PUT " + url);
+		this.addHttpLog("PUT", url);
 
 		HttpEntity entity = null;
 		HttpPut request = null;
@@ -103,7 +104,7 @@ public class ZephyrUtils {
 
 	public void doDelete(String url) throws IOException {
 
-		this.getHttpLog().add("DELETE " + url);
+		this.addHttpLog("DELETE", url);
 
 		HttpDelete request = null;
 		HttpResponse response = null;
@@ -131,6 +132,37 @@ public class ZephyrUtils {
 	public List<String> getHttpLog() {
 
 		return this.httpLog;
+	}
+
+	private void addHttpLog(String method, String url) {
+
+		StringBuilder builder = new StringBuilder();
+
+		builder.append(method + " " + url + "\n");
+		for (String line : lines()) builder.append("  " + line + "\n");
+		builder.append("\n");
+
+		this.getHttpLog().add(builder.toString());
+	}
+
+	private static List<String> lines() {
+
+		List<String> skipMethods = Arrays.asList(new String[] { "lines", "addHttpLog", "doGet", "doPut", "doDelete" });
+		List<String> lines = new ArrayList<String> ();
+		Exception ex = new Exception();
+
+		for (StackTraceElement stackTraceElement : Arrays.asList(ex.getStackTrace())) {
+
+			String className = stackTraceElement.getClassName();
+			String methodName = stackTraceElement.getMethodName();
+			
+			if (skipMethods.contains(methodName)) continue;
+			if (! className.startsWith("xdi2.core") && ! className.startsWith("xdi2.messaging")) continue;
+
+			lines.add(stackTraceElement.toString());
+		}
+
+		return lines;
 	}
 
 	public static String encode(String string) {

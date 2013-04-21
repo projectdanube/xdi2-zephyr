@@ -168,26 +168,14 @@
 			<groupId>xdi2</groupId>
 			<artifactId>xdi2-core</artifactId>
 			<version>0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>xdi2</groupId>
-			<artifactId>xdi2-core</artifactId>
-			<version>0.1-SNAPSHOT</version>
-			<classifier>test</classifier>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>xdi2</groupId>
 			<artifactId>xdi2-messaging</artifactId>
 			<version>0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>xdi2</groupId>
-			<artifactId>xdi2-messaging</artifactId>
-			<version>0.1-SNAPSHOT</version>
-			<classifier>test</classifier>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -282,7 +270,13 @@
 			<dependencies>
 				<dependency>
 					<groupId>xdi2</groupId>
-					<artifactId>xdi2-core</artifactId>
+					<artifactId>xdi2-client</artifactId>
+					<version>0.1-SNAPSHOT</version>
+					<scope>compile</scope>
+				</dependency>
+				<dependency>
+					<groupId>xdi2</groupId>
+					<artifactId>xdi2-server</artifactId>
 					<version>0.1-SNAPSHOT</version>
 					<scope>compile</scope>
 				</dependency>
