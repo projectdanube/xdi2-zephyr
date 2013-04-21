@@ -25,9 +25,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class ZephyrConnection {
+public class ZephyrUtils {
 
-	private static final Logger log = LoggerFactory.getLogger(ZephyrConnection.class);
+	private static final Logger log = LoggerFactory.getLogger(ZephyrUtils.class);
 
 	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 	private static final JsonParser jsonParser = new JsonParser();
@@ -35,7 +35,7 @@ public class ZephyrConnection {
 	private DefaultHttpClient httpClient;
 	private HttpLog httpLog;
 
-	public ZephyrConnection() {
+	public ZephyrUtils() {
 
 		this.httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
 		this.httpLog = new HttpLog();

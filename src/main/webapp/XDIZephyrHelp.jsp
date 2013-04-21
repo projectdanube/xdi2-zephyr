@@ -4,15 +4,15 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>XDI Pixel - Help</title>
+<title>xdi2-zephyr - Help</title>
 <script type="text/javascript" src="tabber.js"></script>
 <link rel="stylesheet" target="_blank" href="style.css" TYPE="text/css" MEDIA="screen">
 </head>
 <body style="background-image: url('images/back.png'); background-repeat: repeat-y; margin-left: 60px;">
 
 	<div class="header">
-	<img src="images/logo64.png" align="middle">&nbsp;&nbsp;&nbsp;<span id="appname">XDI Pixel</span>
-	&nbsp;&nbsp;&nbsp;&nbsp;<a href="XDIPixel">Back...</a>
+	<img src="images/logo64.png" align="middle">&nbsp;&nbsp;&nbsp;<span id="appname">xdi2-zephyr</span>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a href="XDIZephyr">Back...</a>
 	</div>
 
 	<div class="tabber">
@@ -21,15 +21,17 @@
 
 	<h2>Information</h2>
 
-	<p>This is a tool to translate the (Pixel) personal cloud policy language to XDI link contracts.</p>
+	<p>This is a tool to demonstrate integration of the XDI2 server with the Zephyr CloudStore.</p>
 
-	<p>Several example documents are available that can be loaded and translated.</p>
+	<p>An XDI endpoint is set up that uses Zephyr as its backend storage.</p>
+
+	<p>In order to execute XDI operations such as $add or $mod, HTTP calls to the Zephyr Data API are generated. These calls are monitored and displayed in the user interface for debugging purposes.</p>
 
 	<p>For more information see:</p>
 	
 	<ul>
-		<li><a href="https://github.com/projectdanube/xdi2-pixel" target="_blank">https://github.com/projectdanube/xdi2-pixel</a></li>
-		<li><a href="https://github.com/kynetx/PolicyLanguage" target="_blank">https://github.com/kynetx/PolicyLanguage</a></li>
+		<li><a href="https://github.com/projectdanube/xdi2-zephyr" target="_blank">https://github.com/projectdanube/xdi2-zephyr</a></li>
+		<li><a href="https://github.com/airships/zephyr" target="_blank">https://github.com/airships/zephyr</a></li>
 	</ul>
 
 	</div>
