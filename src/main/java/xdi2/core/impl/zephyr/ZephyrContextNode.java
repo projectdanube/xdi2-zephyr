@@ -416,6 +416,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		// manipulation
 
 		JsonArray array = (JsonArray) json.get(arcXri.toString());
+		if (array == null) return;
 		Iterator<JsonElement> iterator = array.iterator();
 		if (! new IteratorContains<JsonElement> (iterator, new JsonPrimitive(targetContextNodeXri.toString())).contains()) return;
 		iterator.remove();

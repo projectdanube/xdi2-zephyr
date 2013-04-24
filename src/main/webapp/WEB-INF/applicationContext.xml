@@ -38,12 +38,9 @@
 	<!-- MESSAGING TARGET at /zephyr -->
 	<!-- MessagingTarget: GraphMessagingTarget backed by a ZephyrGraph -->
 
-	<bean id="zephyrUtils" class="xdi2.core.impl.zephyr.util.ZephyrUtils" />
-
 	<bean id="graphfactory1" class="xdi2.core.impl.zephyr.ZephyrGraphFactory">
 		<property name="dataApi" value="http://192.168.1.100:10002/" />
 		<property name="oauthToken" value="SECRET" />
-		<property name="zephyrUtils" ref="zephyrUtils" />
 	</bean>
 
 	<bean id="graph1" factory-bean="graphfactory1" factory-method="openGraph" />
