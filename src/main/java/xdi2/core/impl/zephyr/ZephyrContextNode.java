@@ -140,8 +140,9 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		ContextNode contextNode = this.getContextNode(arcXri);
 		if (contextNode == null) return;
 
-		// delete incoming relations
+		// delete relations and incoming relations
 
+		contextNode.deleteRelations();
 		contextNode.deleteIncomingRelations();
 
 		// Zephyr request
@@ -164,7 +165,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(contextNodePath); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(contextNodePath);
+		if (json == null) json = new JsonObject();
 
 		// manipulation
 
@@ -180,6 +182,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		// Zephyr request
 
 		json = ((ZephyrGraph) this.getGraph()).doGet(targetContextNodePath);
+		if (json == null) json = new JsonObject();
 
 		// manipulation
 
@@ -218,7 +221,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false));
+		if (json == null) json = new JsonObject();
 
 		// manipulation
 
@@ -237,7 +241,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false));
+		if (json == null) json = new JsonObject();
 
 		// parsing
 
@@ -273,7 +278,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false));
+		if (json == null) json = new JsonObject();
 
 		// parsing
 
@@ -340,7 +346,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 		// Zephyr request
 
-		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false)); 
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false));
+		if (json == null) json = new JsonObject();
 
 		// parsing
 
@@ -412,13 +419,15 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		// Zephyr request
 
 		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(contextNodePath); 
+		if (json == null) json = new JsonObject();
 
 		// manipulation
 
 		JsonArray array = (JsonArray) json.get(arcXri.toString());
-		if (array == null) return;
+		if (array == null) array = new JsonArray();
+		JsonPrimitive jsonPrimitive = new JsonPrimitive(targetContextNodeXri.toString());
 		Iterator<JsonElement> iterator = array.iterator();
-		if (! new IteratorContains<JsonElement> (iterator, new JsonPrimitive(targetContextNodeXri.toString())).contains()) return;
+		if (! new IteratorContains<JsonElement> (iterator, jsonPrimitive).contains()) return;
 		iterator.remove();
 
 		// Zephyr request
@@ -428,12 +437,15 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		// Zephyr request
 
 		json = ((ZephyrGraph) this.getGraph()).doGet(targetContextNodePath); 
+		if (json == null) json = new JsonObject();
 
 		// manipulation
 
 		array = (JsonArray) json.get("/" + arcXri.toString());
+		if (array == null) array = new JsonArray();
+		jsonPrimitive = new JsonPrimitive(this.getXri().toString());
 		iterator = array.iterator();
-		if (! new IteratorContains<JsonElement> (iterator, new JsonPrimitive(targetContextNodeXri.toString())).contains()) return;
+		if (! new IteratorContains<JsonElement> (iterator, jsonPrimitive).contains()) return;
 		iterator.remove();
 
 		// Zephyr request
@@ -507,6 +519,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		// Zephyr request
 
 		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, false)); 
+		if (json == null) json = new JsonObject();
 
 		// manipulation
 

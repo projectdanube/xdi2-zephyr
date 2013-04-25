@@ -56,8 +56,8 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	@Override
 	public void close() {
 
-		this.getCache().removeAll();
-		this.getZephyrUtils().getHttpLog().clear();
+		if (this.getCache() != null) this.getCache().removeAll();
+		if (this.getZephyrUtils() != null) this.getZephyrUtils().getHttpLog().clear();
 	}
 
 	/*

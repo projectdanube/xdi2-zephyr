@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.AbstractGraphFactory;
@@ -24,7 +23,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	static {
 
-		DEFAULT_CACHE = CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getCache("ZephyrGraphFactory_DEFAULT_CACHE");
+		DEFAULT_CACHE = null/*CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getCache("ZephyrGraphFactory_DEFAULT_CACHE")*/;
 		DEFAULT_ZEPHYR_UTILS = new ZephyrUtils();
 	}
 
