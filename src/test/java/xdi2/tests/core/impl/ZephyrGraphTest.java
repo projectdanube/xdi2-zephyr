@@ -2,6 +2,9 @@ package xdi2.tests.core.impl;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xdi2.core.Graph;
 import xdi2.core.impl.zephyr.ZephyrGraphFactory;
 import xdi2.tests.core.graph.AbstractGraphTest;
@@ -9,6 +12,8 @@ import xdi2.tests.core.graph.AbstractGraphTest;
 public class ZephyrGraphTest extends AbstractGraphTest {
 
 	private static ZephyrGraphFactory graphFactory = new ZephyrGraphFactory();
+
+	private static final Logger log = LoggerFactory.getLogger(ZephyrGraphTest.class);
 
 	public static final String URL = "http://192.168.1.100:10002";
 	public static final String TOKEN = "SECRET";
@@ -22,7 +27,7 @@ public class ZephyrGraphTest extends AbstractGraphTest {
 			@Override
 			public void run() {
 
-				System.err.println(ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.getHttpLog().size());
+				log.info("HTTP LOG: " + ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.getHttpLog().size());
 			}
 		});
 	}

@@ -145,6 +145,12 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		contextNode.deleteRelations();
 		contextNode.deleteIncomingRelations();
 
+		for (ContextNode innerContextNode : contextNode.getAllContextNodes()) {
+
+			innerContextNode.deleteRelations();
+			innerContextNode.deleteIncomingRelations();
+		}
+
 		// Zephyr request
 
 		((ZephyrGraph) this.getGraph()).doDelete(ZephyrContextNode.contextNodePath(this, arcXri, true));

@@ -2,12 +2,17 @@ package xdi2.messaging.tests.messagingtarget;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xdi2.core.Graph;
 import xdi2.core.impl.zephyr.ZephyrGraphFactory;
 
 public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTargetTest {
 
 	private static ZephyrGraphFactory graphFactory = new ZephyrGraphFactory();
+
+	private static final Logger log = LoggerFactory.getLogger(ZephyrGraphMessagingTargetTest.class);
 
 	public static final String URL = "http://192.168.1.100:10002";
 	public static final String TOKEN = "SECRET";
@@ -21,7 +26,7 @@ public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTarget
 			@Override
 			public void run() {
 
-				System.err.println(ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.getHttpLog().size());
+				log.info("HTTP LOG: " + ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.getHttpLog().size());
 			}
 		});
 	}
