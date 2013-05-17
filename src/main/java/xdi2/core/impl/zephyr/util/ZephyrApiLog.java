@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class HttpLog extends ArrayList<String> {
+public class ZephyrApiLog extends ArrayList<String> {
 
 	private static final long serialVersionUID = -6754894317139540409L;
 
@@ -12,7 +12,7 @@ public class HttpLog extends ArrayList<String> {
 	private int countPut;
 	private int countDelete;
 
-	public HttpLog() {
+	public ZephyrApiLog() {
 
 		super();
 

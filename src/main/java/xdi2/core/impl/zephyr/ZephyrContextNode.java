@@ -11,7 +11,7 @@ import xdi2.core.Literal;
 import xdi2.core.Relation;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.impl.AbstractContextNode;
-import xdi2.core.impl.zephyr.util.ZephyrUtils;
+import xdi2.core.impl.zephyr.util.ZephyrApi;
 import xdi2.core.util.iterators.CompositeIterator;
 import xdi2.core.util.iterators.EmptyIterator;
 import xdi2.core.util.iterators.IteratorContains;
@@ -87,6 +87,28 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	}
 
 	@Override
+	public ContextNode getDeepContextNode(XDI3Segment contextNodeArcXris) {
+
+		if (XDIConstants.XRI_S_ROOT.equals(contextNodeArcXris) && this.isRootContextNode()) return this;
+
+		// Zephyr request
+
+		JsonObject json = ((ZephyrGraph) this.getGraph()).doGet(ZephyrContextNode.contextNodePath(this, contextNodeArcXris, false));
+		if (json == null) return null;
+
+		// done
+
+		ZephyrContextNode zephyrContextNode = this;
+
+		for (XDI3SubSegment contextNodeArcXri : contextNodeArcXris.getSubSegments()) {
+
+			zephyrContextNode = new ZephyrContextNode((ZephyrGraph) this.getGraph(), zephyrContextNode, contextNodeArcXri);
+		}
+
+		return zephyrContextNode;
+	}
+
+	@Override
 	public ReadOnlyIterator<ContextNode> getContextNodes() {
 
 		// Zephyr request
@@ -127,7 +149,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 			@Override
 			public ContextNode map(Entry<String, JsonElement> entry) {
 
-				XDI3SubSegment arcXri = XDI3SubSegment.create(ZephyrUtils.decode(entry.getKey().substring(prefix.length())));
+				XDI3SubSegment arcXri = XDI3SubSegment.create(ZephyrApi.decode(entry.getKey().substring(prefix.length())));
 
 				return new ZephyrContextNode((ZephyrGraph) ZephyrContextNode.this.getGraph(), ZephyrContextNode.this, arcXri);
 			}
@@ -548,23 +570,26 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		((ZephyrGraph) this.getGraph()).doPut(ZephyrContextNode.contextNodePath(this, false), XDIConstants.XRI_S_LITERAL.toString(), array);
 	}
 
-	public static String contextNodePath(XDI3Segment contextNodeXri, XDI3SubSegment arcXri, boolean star) {
+	public static String contextNodePath(XDI3Segment contextNodeArcXris, XDI3Segment innerContextNodeArcXris, boolean star) {
 
 		StringBuilder contextNodePath = new StringBuilder();
 
-		if (contextNodeXri == null || XDIConstants.XRI_S_ROOT.equals(contextNodeXri)) {
+		if (contextNodeArcXris == null || XDIConstants.XRI_S_ROOT.equals(contextNodeArcXris)) {
 
 		} else {
 
-			for (XDI3SubSegment contextNodeArcXri : contextNodeXri.getSubSegments()) {
+			for (XDI3SubSegment contextNodeArcXri : contextNodeArcXris.getSubSegments()) {
 
-				contextNodePath.append("/" + ZephyrUtils.encode(contextNodeArcXri.toString()));
+				contextNodePath.append("/" + ZephyrApi.encode(contextNodeArcXri.toString()));
 			}
 		}
 
-		if (arcXri != null) {
+		if (innerContextNodeArcXris != null) {
 
-			contextNodePath.append("/" + ZephyrUtils.encode(arcXri.toString()));
+			for (XDI3SubSegment innerContextNodeArcXri : innerContextNodeArcXris.getSubSegments()) {
+
+				contextNodePath.append("/" + ZephyrApi.encode(innerContextNodeArcXri.toString()));
+			}
 		}
 
 		if (star) {
@@ -575,14 +600,24 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		return contextNodePath.toString();
 	}
 
-	public static String contextNodePath(ContextNode contextNode, XDI3SubSegment arcXri, boolean star) {
+	public static String contextNodePath(XDI3Segment contextNodeArcXris, XDI3SubSegment innerContextNodeArcXri, boolean star) {
 
-		return contextNodePath(contextNode.getXri(), arcXri, star);
+		return contextNodePath(contextNodeArcXris, XDI3Segment.create(innerContextNodeArcXri), star);
 	}
 
-	public static String contextNodePath(XDI3Segment contextNodeXri, boolean star) {
+	public static String contextNodePath(ContextNode contextNode, XDI3Segment innerContextNodeArcXris, boolean star) {
 
-		return contextNodePath(contextNodeXri, null, star);
+		return contextNodePath(contextNode.getXri(), innerContextNodeArcXris, star);
+	}
+
+	public static String contextNodePath(ContextNode contextNode, XDI3SubSegment innerContextNodeArcXri, boolean star) {
+
+		return contextNodePath(contextNode.getXri(), innerContextNodeArcXri, star);
+	}
+
+	public static String contextNodePath(XDI3Segment contextNodeArcXris, boolean star) {
+
+		return contextNodePath(contextNodeArcXris, (XDI3Segment) null, star);
 	}
 
 	public static String contextNodePath(ContextNode contextNode, boolean star) {

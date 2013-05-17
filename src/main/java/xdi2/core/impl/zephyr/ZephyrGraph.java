@@ -1,39 +1,31 @@
 package xdi2.core.impl.zephyr;
 
 import java.io.IOException;
-import java.util.Map.Entry;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.exceptions.Xdi2GraphException;
 import xdi2.core.impl.AbstractGraph;
-import xdi2.core.impl.zephyr.util.ZephyrUtils;
+import xdi2.core.impl.zephyr.util.ZephyrApi;
+import xdi2.core.impl.zephyr.util.ZephyrCache;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class ZephyrGraph extends AbstractGraph implements Graph {
 
 	private static final long serialVersionUID = -8716740616499117574L;
 
-	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-	private static final JsonParser jsonParser = new JsonParser();
-
 	private String identifier;
 
 	private String dataApi;
 	private String oauthToken;
-	private Cache cache;
-	private ZephyrUtils zephyrUtils;
+	private ZephyrCache zephyrCache;
+	private ZephyrApi zephyrApi;
 
 	private ZephyrContextNode rootContextNode;
 
-	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, String dataApi, String oauthToken, Cache cache, ZephyrUtils zephyrUtils) {
+	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, String dataApi, String oauthToken, ZephyrCache zephyrCache, ZephyrApi zephyrApi) {
 
 		super(graphFactory);
 
@@ -41,8 +33,8 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		this.dataApi = dataApi;
 		this.oauthToken = oauthToken;
-		this.cache = cache;
-		this.zephyrUtils = zephyrUtils;
+		this.zephyrCache = zephyrCache;
+		this.zephyrApi = zephyrApi;
 
 		this.rootContextNode = new ZephyrContextNode(this, null, null);
 	}
@@ -56,8 +48,8 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	@Override
 	public void close() {
 
-		if (this.getCache() != null) this.getCache().removeAll();
-		if (this.getZephyrUtils() != null) this.getZephyrUtils().getHttpLog().clear();
+		if (this.getZephyrCache() != null) this.getZephyrCache().removeAll();
+		if (this.getZephyrApi() != null) this.getZephyrApi().getZephyrApiLog().clear();
 	}
 
 	/*
@@ -70,20 +62,19 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		// cache
 
-		if (this.getCache() != null && ! graphContextNodePath.endsWith("/*")) {
+		JsonObject json;
 
-			Element element = this.getCache().get(graphContextNodePath);
-			JsonObject cachedJson = element == null ? null : (JsonObject) element.getObjectValue();
-			if (cachedJson != null) return (JsonObject) jsonParser.parse(gson.toJson(cachedJson));
+		if (this.getZephyrCache() != null) {
+
+			json = this.getZephyrCache().fetchFromCache(graphContextNodePath);
+			if (json != null) return json;
 		}
 
 		// http
 
-		JsonObject json;
-
 		try {
 
-			json = this.getZephyrUtils().doGet(url(graphContextNodePath));
+			json = this.getZephyrApi().doGet(url(graphContextNodePath));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP GET: " + ex.getMessage(), ex);
@@ -91,9 +82,9 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		// cache
 
-		if (this.getCache() != null && ! graphContextNodePath.endsWith("/*")) {
+		if (this.getZephyrCache() != null) {
 
-			this.getCache().put(new Element(graphContextNodePath, json));
+			this.getZephyrCache().storeIntoCache(graphContextNodePath, json);
 		}
 
 		// done
@@ -105,11 +96,13 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		String graphContextNodePath = this.graphContextNodePath(contextNodePath);
 
+		if (graphContextNodePath.endsWith("/*")) throw new IllegalArgumentException("Invalid graph context node path for PUT: " + graphContextNodePath);
+
 		// http
 
 		try {
 
-			this.getZephyrUtils().doPut(this.url(graphContextNodePath), json);
+			this.getZephyrApi().doPut(this.url(graphContextNodePath), json);
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP PUT: " + ex.getMessage(), ex);
@@ -117,20 +110,9 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		// cache
 
-		if (this.getCache() != null && ! graphContextNodePath.endsWith("/*")) {
+		if (this.getZephyrCache() != null) {
 
-			Element element = this.getCache().get(graphContextNodePath);
-			JsonObject cachedJson = element == null ? null : (JsonObject) element.getObjectValue();
-
-			if (cachedJson != null) {
-
-				for (Entry<String, JsonElement> entry : json.entrySet()) {
-
-					cachedJson.add(entry.getKey(), entry.getValue());
-				}
-
-				this.getCache().put(new Element(graphContextNodePath, cachedJson));
-			}
+			this.getZephyrCache().mergeIntoCache(graphContextNodePath, json);
 		}
 	}
 
@@ -150,7 +132,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		try {
 
-			this.getZephyrUtils().doDelete(this.url(graphContextNodePath));
+			this.getZephyrApi().doDelete(this.url(graphContextNodePath));
 		} catch (IOException ex) {
 
 			throw new Xdi2GraphException("Problem with HTTP DELETE: " + ex.getMessage(), ex);
@@ -158,17 +140,9 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		// cache
 
-		if (this.getCache() != null) {
+		if (this.getZephyrCache() != null) {
 
-			this.getCache().removeAll();
-
-/* TODO			if (graphContextNodePath.endsWith("/*")) {
-
-				this.getCache().remove(graphContextNodePath.substring(0, graphContextNodePath.length() - 2));
-			} else {
-
-				this.getCache().remove(graphContextNodePath);
-			}*/
+			this.getZephyrCache().removeAll();
 		}
 	}
 
@@ -176,7 +150,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 		StringBuilder graphContextNodePath = new StringBuilder();
 
-		if (this.getIdentifier() != null) graphContextNodePath.append("/" + ZephyrUtils.encode(this.getIdentifier()));
+		if (this.getIdentifier() != null) graphContextNodePath.append("/" + ZephyrApi.encode(this.getIdentifier()));
 		graphContextNodePath.append(contextNodePath);
 
 		return graphContextNodePath.toString();
@@ -215,13 +189,13 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 		return this.oauthToken;
 	}
 
-	public Cache getCache() {
+	public ZephyrCache getZephyrCache() {
 
-		return this.cache;
+		return this.zephyrCache;
 	}
 
-	public ZephyrUtils getZephyrUtils() {
+	public ZephyrApi getZephyrApi() {
 
-		return this.zephyrUtils;
+		return this.zephyrApi;
 	}
 }

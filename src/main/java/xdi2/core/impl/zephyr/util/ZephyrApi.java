@@ -25,25 +25,25 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class ZephyrUtils {
+public class ZephyrApi {
 
-	private static final Logger log = LoggerFactory.getLogger(ZephyrUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(ZephyrApi.class);
 
 	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 	private static final JsonParser jsonParser = new JsonParser();
 
 	private DefaultHttpClient httpClient;
-	private HttpLog httpLog;
+	private ZephyrApiLog zephyrApiLog;
 
-	public ZephyrUtils() {
+	public ZephyrApi() {
 
 		this.httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
-		this.httpLog = new HttpLog();
+		this.zephyrApiLog = new ZephyrApiLog();
 	}
 
 	public JsonObject doGet(String url) throws IOException {
 
-		if (this.getHttpLog() != null) this.getHttpLog().add("GET", url);
+		if (this.getZephyrApiLog() != null) this.getZephyrApiLog().add("GET", url);
 
 		HttpGet request = null;
 		HttpResponse response = null;
@@ -71,7 +71,7 @@ public class ZephyrUtils {
 
 	public void doPut(String url, JsonObject jsonObject) throws IOException {
 
-		if (this.getHttpLog() != null) this.getHttpLog().add("PUT", url);
+		if (this.getZephyrApiLog() != null) this.getZephyrApiLog().add("PUT", url);
 
 		HttpEntity entity = null;
 		HttpPut request = null;
@@ -101,7 +101,7 @@ public class ZephyrUtils {
 
 	public void doDelete(String url) throws IOException {
 
-		if (this.getHttpLog() != null) this.getHttpLog().add("DELETE", url);
+		if (this.getZephyrApiLog() != null) this.getZephyrApiLog().add("DELETE", url);
 
 		HttpDelete request = null;
 		HttpResponse response = null;
@@ -131,14 +131,14 @@ public class ZephyrUtils {
 		this.httpClient = httpClient;
 	}
 
-	public HttpLog getHttpLog() {
+	public ZephyrApiLog getZephyrApiLog() {
 
-		return this.httpLog;
+		return this.zephyrApiLog;
 	}
 
-	public void setHttpLog(HttpLog httpLog) {
+	public void setZephyrApiLog(ZephyrApiLog zephyrApiLog) {
 
-		this.httpLog = httpLog;
+		this.zephyrApiLog = zephyrApiLog;
 	}
 
 	public static String encode(String string) {

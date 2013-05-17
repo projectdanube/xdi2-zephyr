@@ -3,11 +3,12 @@ package xdi2.core.impl.zephyr;
 import java.io.IOException;
 import java.util.UUID;
 
-import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import xdi2.core.Graph;
 import xdi2.core.GraphFactory;
 import xdi2.core.impl.AbstractGraphFactory;
-import xdi2.core.impl.zephyr.util.ZephyrUtils;
+import xdi2.core.impl.zephyr.util.ZephyrApi;
+import xdi2.core.impl.zephyr.util.ZephyrCache;
 
 /**
  * GraphFactory that creates graphs in zephyr.
@@ -18,26 +19,26 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
 	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
-	public static final Cache DEFAULT_CACHE;
-	public static final ZephyrUtils DEFAULT_ZEPHYR_UTILS;
+	public static final ZephyrCache DEFAULT_ZEPHYR_CACHE;
+	public static final ZephyrApi DEFAULT_ZEPHYR_API;
 
 	static {
 
-		DEFAULT_CACHE = null/*CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getCache("ZephyrGraphFactory_DEFAULT_CACHE")*/;
-		DEFAULT_ZEPHYR_UTILS = new ZephyrUtils();
+		DEFAULT_ZEPHYR_CACHE = new ZephyrCache(CacheManager.create(ZephyrGraphFactory.class.getResourceAsStream("ehcache.xml")).getCache("ZephyrGraphFactory_DEFAULT_CACHE"));
+		DEFAULT_ZEPHYR_API = new ZephyrApi();
 	}
 
 	private String dataApi;
 	private String oauthToken;
-	private Cache cache; 
-	private ZephyrUtils zephyrUtils;
+	private ZephyrCache zephyrCache; 
+	private ZephyrApi zephyrApi;
 
 	public ZephyrGraphFactory() {
 
 		this.dataApi = DEFAULT_DATA_API;
 		this.oauthToken = DEFAULT_OAUTH_TOKEN;
-		this.cache = DEFAULT_CACHE;
-		this.zephyrUtils = DEFAULT_ZEPHYR_UTILS;
+		this.zephyrCache = DEFAULT_ZEPHYR_CACHE;
+		this.zephyrApi = DEFAULT_ZEPHYR_API;
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 
 		// create graph
 
-		ZephyrGraph graph = new ZephyrGraph(this, identifier, this.getDataApi(), this.getOauthToken(), this.getCache(), this.getZephyrUtils());
+		ZephyrGraph graph = new ZephyrGraph(this, identifier, this.getDataApi(), this.getOauthToken(), this.getZephyrCache(), this.getZephyrApi());
 
 		// Zephyr request
 
@@ -80,23 +81,23 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 		this.oauthToken = oauthToken;
 	}
 
-	public Cache getCache() {
+	public ZephyrCache getZephyrCache() {
 
-		return this.cache;
+		return this.zephyrCache;
 	}
 
-	public void setCache(Cache cache) {
+	public void setZephyrCache(ZephyrCache zephyrCache) {
 
-		this.cache = cache;
+		this.zephyrCache = zephyrCache;
 	}
 
-	public ZephyrUtils getZephyrUtils() {
+	public ZephyrApi getZephyrApi() {
 
-		return this.zephyrUtils;
+		return this.zephyrApi;
 	}
 
-	public void setZephyrUtils(ZephyrUtils zephyrUtils) {
+	public void setZephyrUtils(ZephyrApi zephyrApi) {
 
-		this.zephyrUtils = zephyrUtils;
+		this.zephyrApi = zephyrApi;
 	}
 }

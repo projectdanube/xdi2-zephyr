@@ -14,7 +14,7 @@ public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTarget
 
 	private static final Logger log = LoggerFactory.getLogger(ZephyrGraphMessagingTargetTest.class);
 
-	public static final String URL = "http://192.168.1.100:10002";
+	public static final String URL = "http://192.168.1.106:10002/";
 	public static final String TOKEN = "SECRET";
 
 	static {
@@ -26,7 +26,7 @@ public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTarget
 			@Override
 			public void run() {
 
-				log.info("HTTP LOG: " + ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.getHttpLog().size());
+				log.info("HTTP LOG: " + ZephyrGraphFactory.DEFAULT_ZEPHYR_API.getZephyrApiLog().size());
 			}
 		});
 	}
@@ -38,7 +38,7 @@ public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTarget
 
 		try {
 
-			ZephyrGraphFactory.DEFAULT_ZEPHYR_UTILS.doDelete(URL + "/?token=" + TOKEN);
+			ZephyrGraphFactory.DEFAULT_ZEPHYR_API.doDelete(URL + "/?token=" + TOKEN);
 		} catch (Exception ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);

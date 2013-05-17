@@ -73,8 +73,8 @@
 		</p>
 	<% } %>
 
-	<% if (request.getAttribute("httpLog") != null) { %>
-		<div class="result"><pre><%= request.getAttribute("httpLog") %></pre></div><br>
+	<% if (request.getAttribute("zephyrApiLog") != null) { %>
+		<div class="result"><pre><%= request.getAttribute("zephyrApiLog") %></pre></div><br>
 	<% } %>
 
 	<% if (request.getAttribute("output") != null) { %>

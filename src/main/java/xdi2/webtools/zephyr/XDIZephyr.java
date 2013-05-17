@@ -121,7 +121,7 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 		String endpoint = request.getParameter("endpoint");
 		String output = "";
 		String stats = "-1";
-		String httpLog = "";
+		String zephyrApiLog = "";
 		String zephyrUrl = "";
 		String error = null;
 
@@ -142,9 +142,10 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 
 		try {
 
-			// reset HTTP log
+			// reset Zephyr logs
 
-			this.getGraph().getZephyrUtils().getHttpLog().clear();
+			this.getGraph().getZephyrApi().getZephyrApiLog().clear();
+			this.getGraph().getZephyrCache().getZephyrCacheLog().clear();
 
 			// parse the message envelope
 
@@ -190,10 +191,10 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 
 		stats = "";
 		stats += Long.toString(stop - start) + " ms time. ";
-		stats += this.getGraph().getZephyrUtils().getHttpLog().getCountGet() + " HTTP GET(s), " + this.getGraph().getZephyrUtils().getHttpLog().getCountPut() + " HTTP PUT(s), " + this.getGraph().getZephyrUtils().getHttpLog().getCountDelete() + " HTTP DELETE(s). ";
-		if (this.getGraph().getCache() != null) stats += this.getGraph().getCache().getStatistics().cacheHitCount() + " cache hits. " + this.getGraph().getCache().getStatistics().cacheMissCount() + " cache misses.";
+		stats += this.getGraph().getZephyrApi().getZephyrApiLog().getCountGet() + " HTTP GET(s), " + this.getGraph().getZephyrApi().getZephyrApiLog().getCountPut() + " HTTP PUT(s), " + this.getGraph().getZephyrApi().getZephyrApiLog().getCountDelete() + " HTTP DELETE(s). ";
+		if (this.getGraph().getZephyrCache() != null) stats += this.getGraph().getZephyrCache().getZephyrCacheLog().getCountHit() + " cache hits. " + this.getGraph().getZephyrCache().getZephyrCacheLog().getCountMiss() + " cache misses.";
 
-		httpLog = "<pre>" + StringUtils.join(this.getGraph().getZephyrUtils().getHttpLog(), "\n") + "</pre>";
+		zephyrApiLog = "<pre>" + StringUtils.join(this.getGraph().getZephyrApi().getZephyrApiLog(), "\n") + "</pre>";
 
 		zephyrUrl = this.getGraph().getDataApi();
 		if (! zephyrUrl.endsWith("/")) zephyrUrl += "/";
@@ -212,7 +213,7 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 		request.setAttribute("endpoint", endpoint);
 		request.setAttribute("output", output);
 		request.setAttribute("stats", stats);
-		request.setAttribute("httpLog", httpLog);
+		request.setAttribute("zephyrApiLog", zephyrApiLog);
 		request.setAttribute("zephyrUrl", zephyrUrl);
 		request.setAttribute("error", error);
 
