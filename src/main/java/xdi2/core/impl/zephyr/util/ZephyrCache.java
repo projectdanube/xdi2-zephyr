@@ -33,29 +33,18 @@ public class ZephyrCache {
 	private JsonObject get(String graphContextNodePath) {
 
 		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("get()", graphContextNodePath);
+		if (log.isDebugEnabled()) log.debug("get(" + graphContextNodePath + ")");
 
 		Element element = this.getCache().get(graphContextNodePath);
+		if (element == null) return null;
 
-		if (element == null) {
-
-			if (log.isTraceEnabled()) log.trace("get(" + graphContextNodePath + ") --> MISS");
-			if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().miss();
-
-			return null;
-		} else {
-
-			if (log.isTraceEnabled()) log.trace("get(" + graphContextNodePath + ") --> HIT");
-			if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().hit();
-
-			return (JsonObject) element.getObjectValue();
-		}
+		return (JsonObject) element.getObjectValue();
 	}
 
 	private void put(String graphContextNodePath, JsonObject cachedJson) {
 
 		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("put()", graphContextNodePath);
-
-		if (log.isTraceEnabled()) log.trace("put(" + graphContextNodePath + "," + cachedJson + ")");
+		if (log.isDebugEnabled()) log.debug("put(" + graphContextNodePath + "," + cachedJson + ")");
 
 		this.getCache().put(new Element(graphContextNodePath, cachedJson));
 	}
@@ -63,15 +52,15 @@ public class ZephyrCache {
 	private void remove(String graphContextNodePath) {
 
 		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("remove()", graphContextNodePath);
-
-		if (log.isTraceEnabled()) log.trace("remove(" + graphContextNodePath + ")");
+		if (log.isDebugEnabled()) log.debug("remove(" + graphContextNodePath + ")");
 
 		this.getCache().remove(graphContextNodePath);
 	}
 
 	public void removeAll() {
 
-		if (log.isTraceEnabled()) log.trace("removeAll()");
+		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("remove()", "/*");
+		if (log.isDebugEnabled()) log.debug("removeAll()");
 
 		this.getCache().removeAll();
 	}
@@ -79,9 +68,20 @@ public class ZephyrCache {
 	public JsonObject fetchFromCache(String graphContextNodePath) {
 
 		JsonObject cachedJson = this.get(graphContextNodePath);
-		if (cachedJson == null) return null;
 
-		return cloneJsonObject(cachedJson);
+		if (cachedJson == null) {
+
+			if (log.isDebugEnabled()) log.debug("MISS(" + graphContextNodePath + ")");
+			if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().miss();
+
+			return null;
+		} else {
+
+			if (log.isDebugEnabled()) log.debug("HIT(" + graphContextNodePath + "): " + cachedJson);
+			if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().hit();
+
+			return cloneJsonObject(cachedJson);
+		}
 	}
 
 	public void storeIntoCache(String graphContextNodePath, JsonObject json) {
@@ -114,14 +114,28 @@ public class ZephyrCache {
 
 		// child urls
 
-		if (graphContextNodePath.endsWith("/*")) {
+		if (graphContextNodePath.endsWith("/*") && json != null) {
 
-			if (json != null) {
+			for (Entry<String, JsonElement> entry : json.entrySet()) {
 
-				for (Entry<String, JsonElement> entry : json.entrySet()) {
+				this.storeIntoCache(entry.getKey(), (JsonObject) entry.getValue());
+			}
+		}
 
-					this.storeIntoCache(entry.getKey(), (JsonObject) entry.getValue());
+		// child urls (star)
+
+		if (graphContextNodePath.endsWith("/*") && json != null) {
+
+			for (Entry<String, JsonElement> entry : json.entrySet()) {
+
+				JsonObject tempJson = cloneJsonObject(json);
+
+				for (Entry<String, JsonElement> entry2 : tempJson.entrySet()) {
+
+					if (! entry2.getKey().equals(entry.getKey()) && ! entry2.getKey().startsWith(entry.getKey() + "/")) continue;
 				}
+
+				this.put(entry.getKey() + "/*", tempJson);
 			}
 		}
 	}
@@ -156,6 +170,8 @@ public class ZephyrCache {
 		if (graphContextNodePath == null) throw new NullPointerException();
 		if (json == null) throw new NullPointerException();
 
+		if (graphContextNodePath.endsWith("/*")) throw new IllegalArgumentException("Illegal graph context node path when merging: " + graphContextNodePath);
+
 		// main url
 
 		JsonObject cachedJson = this.get(graphContextNodePath);
@@ -166,24 +182,18 @@ public class ZephyrCache {
 
 				cachedJson.add(entry.getKey(), entry.getValue());
 			}
-		} else {
 
-			cachedJson = cloneJsonObject(json);
+			this.put(graphContextNodePath, cachedJson);
 		}
-
-		this.put(graphContextNodePath, cachedJson);
 
 		// parent urls
 
-		if (! graphContextNodePath.endsWith("/*")) {
+		String parentGraphContextNodePath = graphContextNodePath;
 
-			String parentGraphContextNodePath = graphContextNodePath;
+		do {
 
-			do {
-
-				this.mergeIntoCacheInner(parentGraphContextNodePath + "/*", graphContextNodePath, json);
-			} while ((parentGraphContextNodePath = parentGraphContextNodePath(parentGraphContextNodePath)) != null);
-		}
+			this.mergeIntoCacheInner(parentGraphContextNodePath + "/*", graphContextNodePath, json);
+		} while ((parentGraphContextNodePath = parentGraphContextNodePath(parentGraphContextNodePath)) != null);
 	}
 
 	private void mergeIntoCacheInner(String graphContextNodePath, String innerGraphContextNodePath, JsonObject json) {
@@ -212,15 +222,9 @@ public class ZephyrCache {
 
 				cachedJson.add(innerGraphContextNodePath, cachedInnerJson);
 			}
-		} else {
 
-			JsonObject cachedInnerJson = cloneJsonObject(json);
-
-			cachedJson = new JsonObject();
-			cachedJson.add(innerGraphContextNodePath, cachedInnerJson);
+			this.put(graphContextNodePath, cachedJson);
 		}
-
-		this.put(graphContextNodePath, cachedJson);
 	}
 
 	private static String parentGraphContextNodePath(String graphContextNodePath) {

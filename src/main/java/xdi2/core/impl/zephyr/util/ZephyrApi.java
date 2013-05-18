@@ -51,16 +51,16 @@ public class ZephyrApi {
 		try {
 
 			request = new HttpGet(url);
-			log.debug("HTTP GET: " + url);
+			if (log.isDebugEnabled()) log.debug("HTTP GET: " + url);
 
 			response = this.httpClient.execute(request);
-			log.debug("HTTP GET RESPONSE: " + response.getStatusLine());
+			if (log.isDebugEnabled()) log.debug("HTTP GET RESPONSE: " + response.getStatusLine());
 
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) return null;
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) throw new IOException("HTTP error " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
 
 			String body = EntityUtils.toString(response.getEntity());
-			log.debug("HTTP GET BODY: " + body);
+			if (log.isDebugEnabled()) log.debug("HTTP GET BODY: " + body);
 
 			return (JsonObject) jsonParser.parse(new StringReader(body));
 		} finally {
@@ -80,17 +80,17 @@ public class ZephyrApi {
 		try {
 
 			String body = gson.toJson(jsonObject);
-			log.debug("HTTP PUT BODY: " + body);
+			if (log.isDebugEnabled()) log.debug("HTTP PUT BODY: " + body);
 
 			entity = new StringEntity(body, ContentType.create("application/json"));
-			log.debug("HTTP PUT ENTITY: " + entity.getContentType());
+			if (log.isDebugEnabled()) log.debug("HTTP PUT ENTITY: " + entity.getContentType());
 
 			request = new HttpPut(url);
-			log.debug("HTTP PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("HTTP PUT: " + url);
 			request.setEntity(entity);
 
 			response = this.httpClient.execute(request);
-			log.debug("HTTP PUT RESPONSE: " + response.getStatusLine());
+			if (log.isDebugEnabled()) log.debug("HTTP PUT RESPONSE: " + response.getStatusLine());
 
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_NO_CONTENT) throw new IOException("HTTP error " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
 		} finally {
@@ -109,10 +109,10 @@ public class ZephyrApi {
 		try {
 
 			request = new HttpDelete(url);
-			log.debug("HTTP DELETE: " + url);
+			if (log.isDebugEnabled()) log.debug("HTTP DELETE: " + url);
 
 			response = this.httpClient.execute(request);
-			log.debug("HTTP DELETE RESPONSE: " + response.getStatusLine());
+			if (log.isDebugEnabled()) log.debug("HTTP DELETE RESPONSE: " + response.getStatusLine());
 
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_NO_CONTENT) throw new IOException("HTTP error " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
 		} finally {

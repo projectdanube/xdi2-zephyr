@@ -24,7 +24,7 @@
 
 	<% } %>
 
-	<p class="subheader">Send a Message to my XDI Endpoint</p>
+	<p class="subheader">Send a message to my XDI endpoint</p>
 
 	<form action="XDIZephyr" method="post">
 
