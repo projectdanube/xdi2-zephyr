@@ -1,4 +1,5 @@
 <ehcache>	
+
 	<cache
 		name="ZephyrGraphFactory_DEFAULT_CACHE"
 		maxEntriesLocalHeap="10000"
@@ -6,5 +7,7 @@
 		timeToIdleSeconds="120"
 		timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" />
+
 	<defaultCache name="default" />
+
 </ehcache>
