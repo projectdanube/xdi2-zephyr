@@ -33,7 +33,7 @@ public class ZephyrCache {
 	private JsonObject get(String graphContextNodePath) {
 
 		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("get()", graphContextNodePath);
-		if (log.isDebugEnabled()) log.debug("get(" + graphContextNodePath + ")");
+		if (log.isTraceEnabled()) log.trace("get(" + graphContextNodePath + ")");
 
 		Element element = this.getCache().get(graphContextNodePath);
 		if (element == null) return null;
@@ -44,7 +44,7 @@ public class ZephyrCache {
 	private void put(String graphContextNodePath, JsonObject cachedJson) {
 
 		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("put()", graphContextNodePath);
-		if (log.isDebugEnabled()) log.debug("put(" + graphContextNodePath + "," + cachedJson + ")");
+		if (log.isTraceEnabled()) log.trace("put(" + graphContextNodePath + "," + cachedJson + ")");
 
 		this.getCache().put(new Element(graphContextNodePath, cachedJson));
 	}
@@ -52,7 +52,7 @@ public class ZephyrCache {
 	private void remove(String graphContextNodePath) {
 
 		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("remove()", graphContextNodePath);
-		if (log.isDebugEnabled()) log.debug("remove(" + graphContextNodePath + ")");
+		if (log.isTraceEnabled()) log.trace("remove(" + graphContextNodePath + ")");
 
 		this.getCache().remove(graphContextNodePath);
 	}
@@ -60,7 +60,7 @@ public class ZephyrCache {
 	public void removeAll() {
 
 		if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().add("remove()", "/*");
-		if (log.isDebugEnabled()) log.debug("removeAll()");
+		if (log.isTraceEnabled()) log.trace("removeAll()");
 
 		this.getCache().removeAll();
 	}
@@ -71,13 +71,13 @@ public class ZephyrCache {
 
 		if (cachedJson == null) {
 
-			if (log.isDebugEnabled()) log.debug("MISS(" + graphContextNodePath + ")");
+			if (log.isTraceEnabled()) log.trace("MISS(" + graphContextNodePath + ")");
 			if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().miss();
 
 			return null;
 		} else {
 
-			if (log.isDebugEnabled()) log.debug("HIT(" + graphContextNodePath + "): " + cachedJson);
+			if (log.isTraceEnabled()) log.trace("HIT(" + graphContextNodePath + "): " + cachedJson);
 			if (this.getZephyrCacheLog() != null) this.getZephyrCacheLog().hit();
 
 			return cloneJsonObject(cachedJson);

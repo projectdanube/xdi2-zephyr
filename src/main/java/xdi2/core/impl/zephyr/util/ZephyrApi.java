@@ -60,7 +60,7 @@ public class ZephyrApi {
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) throw new IOException("HTTP error " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
 
 			String body = EntityUtils.toString(response.getEntity());
-			if (log.isDebugEnabled()) log.debug("HTTP GET BODY: " + body);
+			if (log.isTraceEnabled()) log.trace("HTTP GET BODY: " + body);
 
 			return (JsonObject) jsonParser.parse(new StringReader(body));
 		} finally {
@@ -80,10 +80,10 @@ public class ZephyrApi {
 		try {
 
 			String body = gson.toJson(jsonObject);
-			if (log.isDebugEnabled()) log.debug("HTTP PUT BODY: " + body);
+			if (log.isTraceEnabled()) log.trace("HTTP PUT BODY: " + body);
 
 			entity = new StringEntity(body, ContentType.create("application/json"));
-			if (log.isDebugEnabled()) log.debug("HTTP PUT ENTITY: " + entity.getContentType());
+			if (log.isTraceEnabled()) log.trace("HTTP PUT ENTITY: " + entity.getContentType());
 
 			request = new HttpPut(url);
 			if (log.isDebugEnabled()) log.debug("HTTP PUT: " + url);
