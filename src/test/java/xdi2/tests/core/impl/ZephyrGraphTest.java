@@ -15,7 +15,7 @@ public class ZephyrGraphTest extends AbstractGraphTest {
 
 	private static final Logger log = LoggerFactory.getLogger(ZephyrGraphTest.class);
 
-	public static final String URL = "http://192.168.1.106:10002/";
+	public static final String URL = "http://127.0.0.1:10002/";
 	public static final String TOKEN = "SECRET";
 
 	static {
