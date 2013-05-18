@@ -119,20 +119,12 @@ public class ZephyrCache {
 			for (Entry<String, JsonElement> entry : json.entrySet()) {
 
 				this.storeIntoCache(entry.getKey(), (JsonObject) entry.getValue());
-			}
-		}
 
-		// child urls (star)
+				JsonObject tempJson = new JsonObject();
 
-		if (graphContextNodePath.endsWith("/*") && json != null) {
+				for (Entry<String, JsonElement> entry2 : json.entrySet()) {
 
-			for (Entry<String, JsonElement> entry : json.entrySet()) {
-
-				JsonObject tempJson = cloneJsonObject(json);
-
-				for (Entry<String, JsonElement> entry2 : tempJson.entrySet()) {
-
-					if (! entry2.getKey().equals(entry.getKey()) && ! entry2.getKey().startsWith(entry.getKey() + "/")) continue;
+					if (entry2.getKey().equals(entry.getKey()) || entry2.getKey().startsWith(entry.getKey() + "/")) tempJson.add(entry2.getKey(), cloneJsonObject((JsonObject) entry2.getValue()));
 				}
 
 				this.put(entry.getKey() + "/*", tempJson);
