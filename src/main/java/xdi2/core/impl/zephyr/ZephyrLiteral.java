@@ -5,15 +5,14 @@ import xdi2.core.constants.XDIConstants;
 import xdi2.core.impl.AbstractLiteral;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonPrimitive;
 
 public class ZephyrLiteral extends AbstractLiteral implements Literal {
 
 	private static final long serialVersionUID = 3534354653137496233L;
 
-	private String literalData;
+	private Object literalData;
 
-	public ZephyrLiteral(ZephyrContextNode contextNode, String literalData) {
+	public ZephyrLiteral(ZephyrContextNode contextNode, Object literalData) {
 
 		super(contextNode);
 
@@ -21,16 +20,16 @@ public class ZephyrLiteral extends AbstractLiteral implements Literal {
 	}
 
 	@Override
-	public String getLiteralData() {
+	public Object getLiteralData() {
 
 		return this.literalData;
 	}
 
 	@Override
-	public void setLiteralData(String literalData) {
+	public void setLiteralData(Object literalData) {
 
 		JsonArray array = new JsonArray();
-		array.add(new JsonPrimitive(literalData));
+		array.add(AbstractLiteral.literalDataToJsonPrimitive(literalData));
 
 		// Zephyr request
 

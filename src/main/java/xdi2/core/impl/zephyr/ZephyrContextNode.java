@@ -11,6 +11,7 @@ import xdi2.core.Literal;
 import xdi2.core.Relation;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.impl.AbstractContextNode;
+import xdi2.core.impl.AbstractLiteral;
 import xdi2.core.impl.zephyr.util.ZephyrApi;
 import xdi2.core.util.iterators.CompositeIterator;
 import xdi2.core.util.iterators.EmptyIterator;
@@ -511,10 +512,10 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		super.deleteIncomingRelations();
 	}
 
-	private Literal createLiteralInternal(String literalData) {
+	private Literal createLiteralInternal(Object literalData) {
 
 		JsonArray array = new JsonArray();
-		array.add(new JsonPrimitive(literalData));
+		array.add(AbstractLiteral.literalDataToJsonPrimitive(literalData));
 
 		// Zephyr request
 
@@ -526,7 +527,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	}
 
 	@Override
-	public Literal createLiteral(String literalData) {
+	public Literal createLiteral(Object literalData) {
 
 		this.checkLiteral(literalData, true);
 
@@ -534,7 +535,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	}
 
 	@Override
-	public Literal setLiteral(String literalData) {
+	public Literal setLiteral(Object literalData) {
 
 		this.checkLiteral(literalData, false);
 
