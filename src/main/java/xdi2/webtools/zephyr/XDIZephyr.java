@@ -77,7 +77,7 @@ public class XDIZephyr extends HttpServlet implements HttpRequestHandler {
 			}
 		}
 
-		sampleEndpoint = "/xdi/zephyr"; 
+		sampleEndpoint = "/xdi/graph"; 
 	}
 
 	public XDIZephyr() {

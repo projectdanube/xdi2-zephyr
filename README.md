@@ -41,7 +41,7 @@ Or access the server's status page at
 
 Or use an XDI client to send XDI messages to
 
-    http://localhost:9990/xdi/zephyr
+    http://localhost:9990/xdi/graph
 
 ### How to build as XDI2 plugin
 
