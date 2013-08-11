@@ -11,7 +11,7 @@ import xdi2.core.impl.zephyr.util.ZephyrApi;
 import xdi2.core.impl.zephyr.util.ZephyrCache;
 
 /**
- * GraphFactory that creates graphs in zephyr.
+ * GraphFactory that creates graphs in Zephyr.
  * 
  * @author markus
  */
