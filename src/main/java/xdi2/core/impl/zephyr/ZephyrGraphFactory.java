@@ -17,7 +17,7 @@ import xdi2.core.impl.zephyr.util.ZephyrCache;
  */
 public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFactory {
 
-	public static final String DEFAULT_DATA_API = "http://107.21.179.68:10002/";
+	public static final String DEFAULT_DATA_API = "http://127.0.0.1:10002/";
 	public static final String DEFAULT_OAUTH_TOKEN = "SECRET";
 	public static final ZephyrCache DEFAULT_ZEPHYR_CACHE;
 	public static final ZephyrApi DEFAULT_ZEPHYR_API;
