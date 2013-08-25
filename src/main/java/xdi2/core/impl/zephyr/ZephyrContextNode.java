@@ -515,7 +515,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 	private Literal createLiteralInternal(Object literalData) {
 
 		JsonArray array = new JsonArray();
-		array.add(AbstractLiteral.literalDataToJsonPrimitive(literalData));
+		array.add(AbstractLiteral.literalDataToJsonElement(literalData));
 
 		// Zephyr request
 

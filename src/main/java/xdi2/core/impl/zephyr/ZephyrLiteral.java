@@ -29,7 +29,7 @@ public class ZephyrLiteral extends AbstractLiteral implements Literal {
 	public void setLiteralData(Object literalData) {
 
 		JsonArray array = new JsonArray();
-		array.add(AbstractLiteral.literalDataToJsonPrimitive(literalData));
+		array.add(AbstractLiteral.literalDataToJsonElement(literalData));
 
 		// Zephyr request
 

@@ -16,8 +16,6 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 	private static final long serialVersionUID = -8716740616499117574L;
 
-	private String identifier;
-
 	private String dataApi;
 	private String oauthToken;
 	private ZephyrCache zephyrCache;
@@ -27,9 +25,7 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 
 	ZephyrGraph(ZephyrGraphFactory graphFactory, String identifier, String dataApi, String oauthToken, ZephyrCache zephyrCache, ZephyrApi zephyrApi) {
 
-		super(graphFactory);
-
-		this.identifier = identifier;
+		super(graphFactory, identifier);
 
 		this.dataApi = dataApi;
 		this.oauthToken = oauthToken;
@@ -173,11 +169,6 @@ public class ZephyrGraph extends AbstractGraph implements Graph {
 	/*
 	 * Getters/Setters
 	 */
-
-	public String getIdentifier() {
-
-		return this.identifier;
-	}
 
 	public String getDataApi() {
 
