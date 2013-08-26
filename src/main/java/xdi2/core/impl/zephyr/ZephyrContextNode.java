@@ -553,8 +553,8 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 		// manipulation
 
 		JsonArray array = (JsonArray) json.get(XDIConstants.XRI_S_LITERAL.toString());
-		if (array == null || array.size() < 1 || ! (array.get(0) instanceof JsonPrimitive) || ! ((JsonPrimitive) array.get(0)).isString()) return null;
-		String literalData = ((JsonPrimitive) array.get(0)).getAsString();
+		if (array == null || array.size() < 1) return null;
+		Object literalData = AbstractLiteral.jsonElementToLiteralData(array.get(0));
 
 		// done
 
