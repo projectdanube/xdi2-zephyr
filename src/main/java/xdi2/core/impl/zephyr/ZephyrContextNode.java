@@ -603,7 +603,7 @@ public class ZephyrContextNode extends AbstractContextNode implements ContextNod
 
 	public static String contextNodePath(XDI3Segment contextNodeArcXris, XDI3SubSegment innerContextNodeArcXri, boolean star) {
 
-		return contextNodePath(contextNodeArcXris, XDI3Segment.create(innerContextNodeArcXri), star);
+		return contextNodePath(contextNodeArcXris, XDI3Segment.fromComponent(innerContextNodeArcXri), star);
 	}
 
 	public static String contextNodePath(ContextNode contextNode, XDI3Segment innerContextNodeArcXris, boolean star) {
