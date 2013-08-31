@@ -29,7 +29,7 @@ public class ZephyrApi {
 
 	private static final Logger log = LoggerFactory.getLogger(ZephyrApi.class);
 
-	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
 	private static final JsonParser jsonParser = new JsonParser();
 
 	private DefaultHttpClient httpClient;

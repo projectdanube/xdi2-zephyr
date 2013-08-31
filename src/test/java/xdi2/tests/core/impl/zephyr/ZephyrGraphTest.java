@@ -1,4 +1,4 @@
-package xdi2.tests.core.impl;
+package xdi2.tests.core.impl.zephyr;
 
 import java.io.IOException;
 

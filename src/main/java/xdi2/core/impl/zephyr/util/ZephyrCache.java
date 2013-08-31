@@ -18,7 +18,7 @@ public class ZephyrCache {
 
 	private static final Logger log = LoggerFactory.getLogger(ZephyrCache.class);
 
-	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
 	private static final JsonParser jsonParser = new JsonParser();
 
 	private Cache cache;
