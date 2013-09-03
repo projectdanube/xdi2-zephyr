@@ -44,8 +44,6 @@ public class ZephyrGraphFactory extends AbstractGraphFactory implements GraphFac
 	@Override
 	public Graph openGraph(String identifier) throws IOException {
 
-		// no identifier? create UUID
-
 		if (identifier == null) identifier = UUID.randomUUID().toString();
 
 		// create graph
