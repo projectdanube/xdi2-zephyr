@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import xdi2.core.Graph;
 import xdi2.core.impl.zephyr.ZephyrGraphFactory;
-import xdi2.tests.core.graph.AbstractGraphTest;
+import xdi2.tests.core.impl.AbstractGraphTest;
 
 public class ZephyrGraphTest extends AbstractGraphTest {
 
