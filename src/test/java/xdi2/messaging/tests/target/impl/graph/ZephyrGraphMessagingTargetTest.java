@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import xdi2.core.Graph;
 import xdi2.core.impl.zephyr.ZephyrGraphFactory;
+import xdi2.core.impl.zephyr.util.ZephyrApi;
 
 public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTargetTest {
 
@@ -19,7 +20,8 @@ public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTarget
 
 	static {
 
-		cleanup();
+		graphFactory.setDataApi(URL);
+		graphFactory.setOauthToken(TOKEN);
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -31,18 +33,26 @@ public class ZephyrGraphMessagingTargetTest extends AbstractGraphMessagingTarget
 		});
 	}
 
+	@Override
+	protected void setUp() throws Exception {
+
+		super.setUp();
+
+		ZephyrApi.cleanup(URL, TOKEN);
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+
+		super.tearDown();
+
+		ZephyrApi.cleanup(URL, TOKEN);
+	}
+
 	public static void cleanup() {
 
 		graphFactory.setDataApi(URL);
 		graphFactory.setOauthToken(TOKEN);
-
-		try {
-
-			ZephyrGraphFactory.DEFAULT_ZEPHYR_API.doDelete(URL + "/?token=" + TOKEN);
-		} catch (Exception ex) {
-
-			throw new RuntimeException(ex.getMessage(), ex);
-		}
 	}
 
 	@Override

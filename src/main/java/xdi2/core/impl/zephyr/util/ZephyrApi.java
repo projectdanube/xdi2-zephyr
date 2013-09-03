@@ -20,6 +20,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import xdi2.core.impl.zephyr.ZephyrGraphFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -141,6 +143,10 @@ public class ZephyrApi {
 		this.zephyrApiLog = zephyrApiLog;
 	}
 
+	/*
+	 * Helper methods
+	 */
+	
 	public static String encode(String string) {
 
 		try {
@@ -158,6 +164,17 @@ public class ZephyrApi {
 
 			return URLDecoder.decode(string, "UTF-8");
 		} catch (UnsupportedEncodingException ex) {
+
+			throw new RuntimeException(ex.getMessage(), ex);
+		}
+	}
+
+	public static void cleanup(String url, String token) {
+
+		try {
+
+			ZephyrGraphFactory.DEFAULT_ZEPHYR_API.doDelete(url + "/?token=" + token);
+		} catch (Exception ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
 		}
