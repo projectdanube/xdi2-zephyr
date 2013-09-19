@@ -15,7 +15,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.BasicClientConnectionManager;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class ZephyrApi {
 
 	public ZephyrApi() {
 
-		this.httpClient = new DefaultHttpClient(new BasicClientConnectionManager());
+		this.httpClient = new DefaultHttpClient(new PoolingClientConnectionManager());
 		this.zephyrApiLog = new ZephyrApiLog();
 	}
 
